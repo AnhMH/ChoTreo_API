@@ -311,5 +311,37 @@ return array(
 		 */
 		// 'language'  => array(),
 	// ),
-
+    // Custom config
+    'always_load' => array(
+        'packages' => array(
+            'loglib',
+            'email',
+            'orm',            
+        ),
+    ),
+    'log_threshold' => Fuel::L_DEBUG,
+    'log_path' => APPPATH . 'logs/',
+    'log_date_format' => 'Y-m-d H:i:s',
+    'log_path_bk' => APPPATH . 'logs_bk/',
+    'log_bk_after' => 'y',
+    'time_batch' => 2 * 60,
+    
+    'api_check_security' => true,
+    'api_secret_key' => 'chotreolethuy',
+    'api_request_minute' => 10,// Minute
+    'api_token_expire' => time() + 30 * 24 * 60 * 60, // 30 days
+    'register_token_expire' => time() + 60 * 60, // 1 hour
+    
+    'authorize' => true,
+    'unauthorize_url' => array(),
+    'admin_authorize_url' => array(),
+    'unauthorize_basic_token_url' => array(
+        'versions/check'
+    ),
+    
+    'os' => array(
+        'webos' => 'webos',
+        'ios' => 'ios',
+        'android' => 'android',
+    ),
 );
