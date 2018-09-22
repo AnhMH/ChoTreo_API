@@ -1,7 +1,13 @@
 <?php
 return array (
+  'legacy' => 
+  array (
+    'crypto_key' => '-18FkQNZoxYg7BYIq0VVkxhA',
+    'crypto_iv' => 'Nx4lRccsMJKYAc4ea0s-cwcQ',
+    'crypto_hmac' => 'xQk2qotScq-oweUkgsNx0njA',
+  ),
   'sodium' => 
   array (
-    'cipherkey' => '91aa268f127cb91325263ce6867cf8fd5cd9f3367f054074c27adc3a8598b63d',
+    'cipherkey' => 'e5df6d512cf98da0e45319024061ab5da12d61b51b862d2247f24b88d538bc22',
   ),
 );

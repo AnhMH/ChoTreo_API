@@ -58,7 +58,7 @@ class Model_Admin extends Model_Abstract {
         $user = self::find('first', array(
             'where' => array(
                 'account' => $param['account'],
-                'password' => Lib\Util::encodePassword($param['password'], $param['account'])
+                'password' => \Lib\Util::encodePassword($param['password'], $param['account'])
             )
         ));
         

@@ -290,7 +290,7 @@ class Util {
      * @return string Password after encoding
      */
     public static function encodePassword($pwd, $email = '') {
-        return Crypt::encode($email . ':;' . $pwd);
+        return base64_encode($email . ':;' . $pwd);
     }
 
     /**
@@ -301,7 +301,7 @@ class Util {
      * @return string Password after decoding
      */
     public static function decodePassword($pwd) {
-        return Crypt::decode($pwd);
+        return Crypt::decode($pwd, 'e5df6d512cf98da0e45319024061ab5da12d61b51b862d2247f24b88d538bc22');
     }
 
     /**

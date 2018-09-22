@@ -15,9 +15,17 @@ class Controller_Test extends \Controller_App {
      * @return  Response
      */
     public function action_index() {
-        echo 'API Test';
+//        echo 'API Test';
+        echo \Lib\Util::encodePassword('123456', 'admin');
+        $param = array(
+            'account' => 'admin',
+            'password' => '123456'
+        );
+        $data = Model_Admin::get_login($param);
+        var_dump($data);
+        die();
     }
-    
+
     /**
      * Generate pass
      *
@@ -30,5 +38,5 @@ class Controller_Test extends \Controller_App {
         $pass = $_GET['pw'];
         echo \Lib\Util::encodePassword($pass, $account);
     }
-
+    
 }
