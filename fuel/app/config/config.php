@@ -326,6 +326,8 @@ return array(
     'log_bk_after' => 'y',
     'time_batch' => 2 * 60,
     
+    'image_ext' =>  array('jpeg', 'jpg', 'gif', 'png'),
+    
     'api_check_security' => true,
     'api_secret_key' => 'chotreolethuy',
     'api_request_minute' => 10,// Minute
@@ -333,7 +335,9 @@ return array(
     'register_token_expire' => time() + 60 * 60, // 1 hour
     
     'authorize' => true,
-    'unauthorize_url' => array(),
+    'unauthorize_url' => array(
+        'admins/login'
+    ),
     'admin_authorize_url' => array(),
     'unauthorize_basic_token_url' => array(
         'versions/check'

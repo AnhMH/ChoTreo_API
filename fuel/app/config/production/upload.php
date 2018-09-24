@@ -8,5 +8,5 @@ return array(
 	'change_case' => 'lower',
 	'randomize' => true,
 	'ext_whitelist' => array('jpeg', 'jpg', 'gif', 'png', 'mp4', 'flv'),
-        'max_size' => 1024 * 512, // 512KB
+        'max_size' => 1 * 512, // 512KB
 );
