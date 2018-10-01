@@ -55,18 +55,10 @@ class Model_Admin extends Model_Abstract {
     public static function get_login($param)
     {
         $login = array();
-        $user = self::find('first', array(
-            'where' => array(
-                'account' => $param['account'],
-                'password' => \Lib\Util::encodePassword($param['password'], $param['account'])
-            )
+        $login = self::get_profile(array(
+            'email' => $param['email'],
+            'password' => \Lib\Util::encodePassword($param['password'], $param['email'])
         ));
-        
-        if (!empty($user['id'])) {
-            $login = self::get_profile(array(
-                'admin_id' => $user['id']
-            ));
-        }
         
         if (!empty($login)) {
             if (empty($login['disable'])) {
@@ -92,18 +84,25 @@ class Model_Admin extends Model_Abstract {
      */
     public static function get_profile($param)
     {
-        if (empty($param['admin_id'])) {
-            static::errorNotExist('admin_id');
-            return false;
-        }
-        
+        // Query
         $query = DB::select(
                 self::$_table_name.'.*'
             )
             ->from(self::$_table_name)
-            ->where(self::$_table_name . '.id', $param['admin_id'])
         ;
         
+        // Filter
+        if (!empty($param['admin_id'])) {
+            $query->where(self::$_table_name.'.id', $param['admin_id']);
+        }
+        if (!empty($param['email'])) {
+            $query->where(self::$_table_name.'.email', $param['email']);
+        }
+        if (!empty($param['password'])) {
+            $query->where(self::$_table_name.'.password', $param['password']);
+        }        
+        
+        // Get data
         $data = $query->execute()->offsetGet(0);
         
         if (empty($data)) {

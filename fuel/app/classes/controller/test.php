@@ -16,14 +16,8 @@ class Controller_Test extends \Controller_App {
      */
     public function action_index() {
 //        echo 'API Test';
-        echo \Lib\Util::encodePassword('123456', 'admin');
-        $param = array(
-            'account' => 'admin',
-            'password' => '123456'
-        );
-        $data = Model_Admin::get_login($param);
-        var_dump($data);
-        die();
+        echo \Lib\Util::encodePassword('123456', 'admin@chotreo.com');
+        
     }
 
     /**

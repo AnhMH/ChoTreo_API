@@ -14,13 +14,13 @@ class Admins_Login extends BusAbstract
 {
     /** @var array $_required field require */
     protected $_required = array(
-        'account',
+        'email',
         'password'
     );
 
     /** @var array $_length Length of fields */
     protected $_length = array(
-        'account'    => array(1, 255),
+        'email'    => array(1, 255),
     );
 
     /** @var array $_email_format field email */
