@@ -15,9 +15,11 @@ class Controller_Test extends \Controller_App {
      * @return  Response
      */
     public function action_index() {
-//        echo 'API Test';
-        echo \Lib\Util::encodePassword('123456', 'admin@chotreo.com');
-        
+        $param = array();
+        $data = Model_Customer::get_list($param);
+        echo '<pre>';
+        print_r($data);
+        die();
     }
 
     /**
