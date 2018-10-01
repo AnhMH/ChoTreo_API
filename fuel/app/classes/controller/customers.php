@@ -20,4 +20,18 @@ class Controller_Customers extends \Controller_App {
     public function action_addupdate() {
         return \Bus\Customers_AddUpdate::getInstance()->execute();
     }
+    
+    /**
+     * Customer detail
+     */
+    public function action_detail() {
+        return \Bus\Customers_Detail::getInstance()->execute();
+    }
+    
+    /**
+     * Customer delete
+     */
+    public function action_delete() {
+        return \Bus\Customers_Delete::getInstance()->execute();
+    }
 }

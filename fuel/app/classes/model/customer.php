@@ -150,7 +150,7 @@ class Model_Customer extends Model_Abstract {
         if (!empty($param['birthday'])) {
             $self->set('birthday', $param['birthday']);
         }
-        if (!empty($param['gender'])) {
+        if (isset($param['gender'])) {
             $self->set('gender', $param['gender']);
         }
         
@@ -170,5 +170,40 @@ class Model_Customer extends Model_Abstract {
         }
         
         return false;
+    }
+    
+    /**
+     * Get detail
+     *
+     * @author AnhMH
+     * @param array $param Input data
+     * @return array
+     */
+    public static function get_detail($param)
+    {
+        $data = array();
+        
+        $data['customer'] = self::find($param['id']);
+        
+        return $data;
+    }
+    
+    /**
+     * Delete
+     *
+     * @author AnhMH
+     * @param array $param Input data
+     * @return Int|bool
+     */
+    public static function del($param)
+    {
+        $delete = self::deleteRow(self::$_table_name, array(
+            'id' => $param['id']
+        ));
+        if ($delete) {
+            return $param['id'];
+        } else {
+            return 0;
+        }
     }
 }
