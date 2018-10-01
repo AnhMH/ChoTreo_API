@@ -13,4 +13,11 @@ class Controller_Customers extends \Controller_App {
     public function action_list() {
         return \Bus\Customers_List::getInstance()->execute();
     }
+    
+    /**
+     * Customer add/update
+     */
+    public function action_addupdate() {
+        return \Bus\Customers_AddUpdate::getInstance()->execute();
+    }
 }

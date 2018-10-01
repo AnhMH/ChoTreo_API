@@ -89,4 +89,86 @@ class Model_Customer extends Model_Abstract {
             'data' => $data
         );
     }
+    
+    /**
+     * Add update info
+     *
+     * @author AnhMH
+     * @param array $param Input data
+     * @return int|bool User ID or false if error
+     */
+    public static function add_update($param)
+    {
+        // Init
+        $adminId = !empty($param['admin_id']) ? $param['admin_id'] : '';
+        $id = !empty($param['id']) ? $param['id'] : 0;
+        $self = array();
+        
+        // Check code
+        if (!empty($param['code'])) {
+            $check = self::find('first', array(
+                'where' => array(
+                    'code' => $param['code'],
+                    array('id', '!=', $id)
+                )
+            ));
+            if (!empty($check)) {
+                self::errorDuplicate('code');
+                return false;
+            }
+        }
+        
+        
+        // Check if exist User
+        if (!empty($id)) {
+            $self = self::find($id);
+            if (empty($self)) {
+                self::errorNotExist('user_id');
+                return false;
+            }
+        } else {
+            $self = new self;
+        }
+        
+        // Set data
+        $self->set('admin_id', $adminId);
+        if (!empty($param['name'])) {
+            $self->set('name', $param['name']);
+        }
+        if (!empty($param['address'])) {
+            $self->set('address', $param['address']);
+        }
+        if (!empty($param['phone'])) {
+            $self->set('phone', $param['phone']);
+        }
+        if (!empty($param['email'])) {
+            $self->set('email', $param['email']);
+        }
+        if (!empty($param['notes'])) {
+            $self->set('notes', $param['notes']);
+        }
+        if (!empty($param['birthday'])) {
+            $self->set('birthday', $param['birthday']);
+        }
+        if (!empty($param['gender'])) {
+            $self->set('gender', $param['gender']);
+        }
+        
+        // Save data
+        if ($self->save()) {
+            if (empty($self->id)) {
+                $self->id = self::cached_object($self)->_original['id'];
+            }
+            if (!empty($param['code'])) {
+                $code = $param['code'];
+            } else {
+                $code = Lib\Str::generate_code('KH', $self->id);
+            }
+            $self->set('code', $code);
+            $self->save();
+            return $self->id;
+        }
+        
+        return false;
+    }
 }

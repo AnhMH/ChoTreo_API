@@ -234,4 +234,31 @@ class Str {
     public static function getNumber($string) {
         return preg_replace('/\D/', '', $string);
     }
+    
+    
+    /**
+     * Generate code
+     *
+     * @author AnhMH
+     * @param array $param Input data
+     * @return string
+     */
+    public static function generate_code($prefix, $value)
+    {
+        $code = '';
+        if ($value < 10)
+            $code = 'KH00000' . ($value);
+        else if ($value < 100)
+            $code = 'KH0000' . ($value);
+        else if ($value < 1000)
+            $code = 'KH000' . ($value);
+        else if ($value < 10000)
+            $code = 'KH00' . ($value);
+        else if ($value < 100000)
+            $code = 'KH0' . ($value);
+        else if ($value < 1000000)
+            $code = 'KH' . ($value);
+        
+        return $code;
+    }
 }
