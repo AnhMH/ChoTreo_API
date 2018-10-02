@@ -34,7 +34,7 @@ class Model_Product extends Model_Abstract {
         'seo_description',
         'seo_keyword',
         'created',
-        'updated'.
+        'updated',
         'admin_id'
     );
 
@@ -158,23 +158,53 @@ class Model_Product extends Model_Abstract {
         if (!empty($param['code']) && $new) {
             $self->set('code', $param['code']);
         }
-        if (!empty($param['address'])) {
-            $self->set('address', $param['address']);
+        if (isset($param['qty'])) {
+            $self->set('qty', $param['qty']);
         }
-        if (!empty($param['phone'])) {
-            $self->set('phone', $param['phone']);
+        if (isset($param['origin_price'])) {
+            $self->set('origin_price', $param['origin_price']);
         }
-        if (!empty($param['email'])) {
-            $self->set('email', $param['email']);
+        if (isset($param['sell_price'])) {
+            $self->set('sell_price', $param['sell_price']);
         }
-        if (!empty($param['notes'])) {
-            $self->set('notes', $param['notes']);
+        if (isset($param['is_inventory'])) {
+            $self->set('is_inventory', $param['is_inventory']);
         }
-        if (!empty($param['birthday'])) {
-            $self->set('birthday', $param['birthday']);
+        if (isset($param['status'])) {
+            $self->set('status', $param['status']);
         }
-        if (isset($param['gender'])) {
-            $self->set('gender', $param['gender']);
+        if (isset($param['is_allow_negative'])) {
+            $self->set('is_allow_negative', $param['is_allow_negative']);
+        }
+        if (isset($param['cate_id'])) {
+            $self->set('cate_id', $param['cate_id']);
+        }
+        if (isset($param['manufacture_id'])) {
+            $self->set('manufacture_id', $param['manufacture_id']);
+        }
+        if (isset($param['description'])) {
+            $self->set('description', $param['description']);
+        }
+        if (isset($param['image'])) {
+            $self->set('image', $param['image']);
+        }
+        if (isset($param['is_hot'])) {
+            $self->set('is_hot', $param['is_hot']);
+        }
+        if (isset($param['is_new'])) {
+            $self->set('is_new', $param['is_new']);
+        }
+        if (isset($param['is_feature'])) {
+            $self->set('is_feature', $param['is_feature']);
+        }
+        if (isset($param['is_display_web'])) {
+            $self->set('is_display_web', $param['is_display_web']);
+        }
+        if (isset($param['seo_description'])) {
+            $self->set('seo_description', $param['seo_description']);
+        }
+        if (isset($param['seo_keyword'])) {
+            $self->set('seo_keyword', $param['seo_keyword']);
         }
         
         // Save data
@@ -183,7 +213,7 @@ class Model_Product extends Model_Abstract {
                 $self->id = self::cached_object($self)->_original['id'];
             }
             if (empty($param['code']) && $new) {
-                $code = Lib\Str::generate_code('KH', $self->id);
+                $code = Lib\Str::generate_code('SP', $self->id);
                 $self->set('code', $code);
                 $self->save();
             }
@@ -204,7 +234,7 @@ class Model_Product extends Model_Abstract {
     {
         $data = array();
         
-        $data['customer'] = self::find($param['id']);
+        $data['product'] = self::find($param['id']);
         
         return $data;
     }
