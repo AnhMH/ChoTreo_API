@@ -247,17 +247,17 @@ class Str {
     {
         $code = '';
         if ($value < 10)
-            $code = 'KH00000' . ($value);
+            $code = $prefix.'00000' . ($value);
         else if ($value < 100)
-            $code = 'KH0000' . ($value);
+            $code = $prefix.'0000' . ($value);
         else if ($value < 1000)
-            $code = 'KH000' . ($value);
+            $code = $prefix.'000' . ($value);
         else if ($value < 10000)
-            $code = 'KH00' . ($value);
+            $code = $prefix.'00' . ($value);
         else if ($value < 100000)
-            $code = 'KH0' . ($value);
+            $code = $prefix.'0' . ($value);
         else if ($value < 1000000)
-            $code = 'KH' . ($value);
+            $code = $prefix.'' . ($value);
         
         return $code;
     }

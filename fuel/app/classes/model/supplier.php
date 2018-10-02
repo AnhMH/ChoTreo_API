@@ -10,7 +10,7 @@ use Fuel\Core\DB;
  * @version 1.0
  * @author AnhMH
  */
-class Model_Customer extends Model_Abstract {
+class Model_Supplier extends Model_Abstract {
     
     /** @var array $_properties field of table */
     protected static $_properties = array(
@@ -21,8 +21,6 @@ class Model_Customer extends Model_Abstract {
         'email',
         'address',
         'notes',
-        'birthday',
-        'gender',
         'admin_id',
         'created',
         'updated'
@@ -40,14 +38,14 @@ class Model_Customer extends Model_Abstract {
     );
 
     /** @var array $_table_name name of table */
-    protected static $_table_name = 'customers';
+    protected static $_table_name = 'suppliers';
 
     /**
-     * List Customer
+     * List Supplier
      *
      * @author AnhMH
      * @param array $param Input data
-     * @return array|bool Detail Customer or false if error
+     * @return array|bool Detail Supplier or false if error
      */
     public static function get_list($param)
     {
@@ -174,7 +172,7 @@ class Model_Customer extends Model_Abstract {
                 $self->id = self::cached_object($self)->_original['id'];
             }
             if (empty($param['code']) && $new) {
-                $code = Lib\Str::generate_code('KH', $self->id);
+                $code = Lib\Str::generate_code('NCC', $self->id);
                 $self->set('code', $code);
                 $self->save();
             }
@@ -195,7 +193,7 @@ class Model_Customer extends Model_Abstract {
     {
         $data = array();
         
-        $data['customer'] = self::find($param['id']);
+        $data['supplier'] = self::find($param['id']);
         
         return $data;
     }
