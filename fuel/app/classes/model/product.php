@@ -150,6 +150,16 @@ class Model_Product extends Model_Abstract {
             $new = true;
         }
         
+        // Upload image
+        if (!empty($_FILES)) {
+            $uploadResult = \Lib\Util::uploadImage(); 
+            if ($uploadResult['status'] != 200) {
+                self::setError($uploadResult['error']);
+                return false;
+            }
+            $param['image'] = !empty($uploadResult['body']['image']) ? $uploadResult['body']['image'] : '';
+        }
+        
         // Set data
         $self->set('admin_id', $adminId);
         if (!empty($param['name'])) {
