@@ -10,32 +10,16 @@ use Fuel\Core\DB;
  * @version 1.0
  * @author AnhMH
  */
-class Model_Product extends Model_Abstract {
+class Model_Cate extends Model_Abstract {
     
     /** @var array $_properties field of table */
     protected static $_properties = array(
         'id',
-        'code',
         'name',
-        'qty',
-        'origin_price',
-        'sell_price',
-        'is_inventory',
-        'is_allow_negative',
-        'cate_id',
-        'manufacture_id',
-        'description',
-        'image',
-        'is_hot',
-        'is_new',
-        'is_feature',
-        'is_display_web',
-        'seo_description',
-        'seo_keyword',
+        'parent_id',
         'admin_id',
         'created',
         'updated',
-        'disable',
     );
 
     protected static $_observers = array(
@@ -50,25 +34,22 @@ class Model_Product extends Model_Abstract {
     );
 
     /** @var array $_table_name name of table */
-    protected static $_table_name = 'products';
+    protected static $_table_name = 'cates';
 
     /**
-     * List Product
+     * List Cate
      *
      * @author AnhMH
      * @param array $param Input data
-     * @return array|bool Detail Product or false if error
+     * @return array|bool Detail Cate or false if error
      */
     public static function get_list($param)
     {
         // Query
         $query = DB::select(
-                self::$_table_name.'.*',
-                array('cates.name', 'cate_name')
+                self::$_table_name.'.*'
             )
             ->from(self::$_table_name)
-            ->join('cates', 'LEFT')
-            ->on('cates.id', '=', self::$_table_name.'.cate_id')
         ;
         
         // Filter
@@ -82,10 +63,6 @@ class Model_Product extends Model_Abstract {
             $query->where(self::$_table_name.'.disable', $param['disable']);
         } else {
             $query->where(self::$_table_name.'.disable', 0);
-        }
-        if (!empty($param['cate_id'])) {
-            $cateIds = explode(',', $param['cate_id']);
-            $query->where(self::$_table_name.'.cate_id', 'IN', $cateIds);
         }
         
         // Pagination
@@ -118,6 +95,28 @@ class Model_Product extends Model_Abstract {
             'total' => $total,
             'data' => $data
         );
+    }
+    
+    /**
+     * List Cate
+     *
+     * @author AnhMH
+     * @param array $param Input data
+     * @return array|bool Detail Cate or false if error
+     */
+    public static function get_all($param)
+    {
+        // Query
+        $query = DB::select(
+                self::$_table_name.'.*'
+            )
+            ->from(self::$_table_name)
+        ;
+        
+        // Get data
+        $data = $query->execute()->as_array();
+        
+        return $data;
     }
     
     /**
