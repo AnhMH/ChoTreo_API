@@ -21,7 +21,6 @@ class Model_Product extends Model_Abstract {
         'origin_price',
         'sell_price',
         'is_inventory',
-        'status',
         'is_allow_negative',
         'cate_id',
         'manufacture_id',
@@ -33,9 +32,10 @@ class Model_Product extends Model_Abstract {
         'is_display_web',
         'seo_description',
         'seo_keyword',
+        'admin_id',
         'created',
         'updated',
-        'admin_id'
+        'disable',
     );
 
     protected static $_observers = array(
@@ -74,6 +74,11 @@ class Model_Product extends Model_Abstract {
             $query->where(self::$_table_name.'.name', 'LIKE', "%{$param['keyword']}%");
             $query->or_where(self::$_table_name.'.code', 'LIKE', "%{$param['keyword']}%");
             $query->where_close();
+        }
+        if (isset($param['disable']) && $param['disable'] != '') {
+            $query->where(self::$_table_name.'.disable', $param['disable']);
+        } else {
+            $query->where(self::$_table_name.'.disable', 0);
         }
         
         // Pagination
@@ -266,5 +271,30 @@ class Model_Product extends Model_Abstract {
         } else {
             return 0;
         }
+    }
+    
+    /**
+     * Disable
+     *
+     * @author AnhMH
+     * @param array $param Input data
+     * @return Int|bool
+     */
+    public static function disable($param)
+    {
+        $disable = !empty($param['disable']) ? 1 : 0;
+        $self = self::find($param['id']);
+        if (empty($self)) {
+            self::errorNotExist('product_id');
+            return false;
+        }
+        $self->set('disable', $disable);
+        if ($self->save()) {
+            if (empty($self->id)) {
+                $self->id = self::cached_object($self)->_original['id'];
+            }
+            return $self->id;
+        }
+        return false;
     }
 }

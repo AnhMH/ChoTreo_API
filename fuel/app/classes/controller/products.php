@@ -34,4 +34,11 @@ class Controller_Products extends \Controller_App {
     public function action_delete() {
         return \Bus\Products_Delete::getInstance()->execute();
     }
+    
+    /**
+     * Product disable
+     */
+    public function action_disable() {
+        return \Bus\Products_Disable::getInstance()->execute();
+    }
 }
