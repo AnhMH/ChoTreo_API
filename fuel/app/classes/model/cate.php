@@ -130,15 +130,15 @@ class Model_Cate extends Model_Abstract {
         $new = false;
         
         // Check code
-        if (!empty($param['code'])) {
+        if (!empty($param['name'])) {
             $check = self::find('first', array(
                 'where' => array(
-                    'code' => $param['code'],
+                    'name' => $param['name'],
                     array('id', '!=', $id)
                 )
             ));
             if (!empty($check)) {
-                self::errorDuplicate('code');
+                self::errorDuplicate('name');
                 return false;
             }
         }
@@ -148,7 +148,7 @@ class Model_Cate extends Model_Abstract {
         if (!empty($id)) {
             $self = self::find($id);
             if (empty($self)) {
-                self::errorNotExist('user_id');
+                self::errorNotExist('cate_id');
                 return false;
             }
         } else {
@@ -156,82 +156,19 @@ class Model_Cate extends Model_Abstract {
             $new = true;
         }
         
-        // Upload image
-        if (!empty($_FILES)) {
-            $uploadResult = \Lib\Util::uploadImage(); 
-            if ($uploadResult['status'] != 200) {
-                self::setError($uploadResult['error']);
-                return false;
-            }
-            $param['image'] = !empty($uploadResult['body']['image']) ? $uploadResult['body']['image'] : '';
-        }
-        
         // Set data
         $self->set('admin_id', $adminId);
         if (!empty($param['name'])) {
             $self->set('name', $param['name']);
         }
-        if (!empty($param['code']) && $new) {
-            $self->set('code', $param['code']);
-        }
-        if (isset($param['qty'])) {
-            $self->set('qty', $param['qty']);
-        }
-        if (isset($param['origin_price'])) {
-            $self->set('origin_price', $param['origin_price']);
-        }
-        if (isset($param['sell_price'])) {
-            $self->set('sell_price', $param['sell_price']);
-        }
-        if (isset($param['is_inventory'])) {
-            $self->set('is_inventory', $param['is_inventory']);
-        }
-        if (isset($param['status'])) {
-            $self->set('status', $param['status']);
-        }
-        if (isset($param['is_allow_negative'])) {
-            $self->set('is_allow_negative', $param['is_allow_negative']);
-        }
-        if (isset($param['cate_id'])) {
-            $self->set('cate_id', $param['cate_id']);
-        }
-        if (isset($param['manufacture_id'])) {
-            $self->set('manufacture_id', $param['manufacture_id']);
-        }
-        if (isset($param['description'])) {
-            $self->set('description', $param['description']);
-        }
-        if (isset($param['image'])) {
-            $self->set('image', $param['image']);
-        }
-        if (isset($param['is_hot'])) {
-            $self->set('is_hot', $param['is_hot']);
-        }
-        if (isset($param['is_new'])) {
-            $self->set('is_new', $param['is_new']);
-        }
-        if (isset($param['is_feature'])) {
-            $self->set('is_feature', $param['is_feature']);
-        }
-        if (isset($param['is_display_web'])) {
-            $self->set('is_display_web', $param['is_display_web']);
-        }
-        if (isset($param['seo_description'])) {
-            $self->set('seo_description', $param['seo_description']);
-        }
-        if (isset($param['seo_keyword'])) {
-            $self->set('seo_keyword', $param['seo_keyword']);
+        if (isset($param['parent_id'])) {
+            $self->set('parent_id', $param['parent_id']);
         }
         
         // Save data
         if ($self->save()) {
             if (empty($self->id)) {
                 $self->id = self::cached_object($self)->_original['id'];
-            }
-            if (empty($param['code']) && $new) {
-                $code = Lib\Str::generate_code('SP', $self->id);
-                $self->set('code', $code);
-                $self->save();
             }
             return $self->id;
         }
