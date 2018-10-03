@@ -255,8 +255,16 @@ class Model_Product extends Model_Abstract {
     public static function get_detail($param)
     {
         $data = array();
-        
-        $data['product'] = self::find($param['id']);
+        $query = DB::select(
+                self::$_table_name.'.*',
+                array('cates.name', 'cate_name')
+            )
+            ->from(self::$_table_name)
+            ->join('cates', 'LEFT')
+            ->on('cates.id', '=', self::$_table_name.'.cate_id')
+            ->where(self::$_table_name.'.id', $param['id'])
+        ;
+        $data['product'] = $query->execute()->offsetGet(0);;
         
         return $data;
     }

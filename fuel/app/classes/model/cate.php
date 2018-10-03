@@ -59,11 +59,6 @@ class Model_Cate extends Model_Abstract {
             $query->or_where(self::$_table_name.'.code', 'LIKE', "%{$param['keyword']}%");
             $query->where_close();
         }
-        if (isset($param['disable']) && $param['disable'] != '') {
-            $query->where(self::$_table_name.'.disable', $param['disable']);
-        } else {
-            $query->where(self::$_table_name.'.disable', 0);
-        }
         
         // Pagination
         if (!empty($param['page']) && $param['limit']) {
