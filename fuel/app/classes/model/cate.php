@@ -201,14 +201,26 @@ class Model_Cate extends Model_Abstract {
      */
     public static function del($param)
     {
-        $delete = self::deleteRow(self::$_table_name, array(
+        if (empty($param['delete_product'])) {
+            $product = Model_Product::find('first', array(
+                'where' => array(
+                    'cate_id' => $param['id']
+                )
+            ));
+            if (!empty($product)) {
+                return -1;
+            }
+        } else {
+            self::deleteRow('products', array(
+                'cate_id' => $param['id']
+            ));
+        }
+        
+        self::deleteRow(self::$_table_name, array(
             'id' => $param['id']
         ));
-        if ($delete) {
-            return $param['id'];
-        } else {
-            return 0;
-        }
+        
+        return $param['id'];
     }
     
     /**
