@@ -118,10 +118,15 @@ class Model_Order extends Model_Abstract {
         // Get data
         $data = $query->execute()->as_array();
         $total = !empty($data) ? DB::count_last_query(self::$slave_db) : 0;
+        $customers = array();
+        if (!empty($param['get_customers'])) {
+            $customers = Model_Customer::get_all(array());
+        }
         
         return array(
             'total' => $total,
-            'data' => $data
+            'data' => $data,
+            'customers' => $customers
         );
     }
     
