@@ -69,18 +69,28 @@ class Model_Order extends Model_Abstract {
         
         // Filter
         if (!empty($param['keyword'])) {
-            $query->where_open();
-            $query->where(self::$_table_name.'.name', 'LIKE', "%{$param['keyword']}%");
             $query->or_where(self::$_table_name.'.code', 'LIKE', "%{$param['keyword']}%");
-            $query->where_close();
         }
-        if (isset($param['disable']) && $param['disable'] != '') {
-            $query->where(self::$_table_name.'.disable', $param['disable']);
+        if (isset($param['option1']) && $param['option1'] != '') {
+            if ($param['option1'] == 1) {
+                $query->where(self::$_table_name.'.disable', 1);
+            } else {
+                $query->where(self::$_table_name.'.disable', 0);
+            }
+            if ($param['option1'] == 2) {
+                $query->where(self::$_table_name.'.lack', '>', 0);
+            }
         } else {
             $query->where(self::$_table_name.'.disable', 0);
         }
         if (!empty($param['customer_id'])) {
             $query->where(self::$_table_name.'.customer_id', $param['customer_id']);
+        }
+        if (!empty($param['date_from'])) {
+            $query->where(self::$_table_name.'.created', '>=', self::time_to_val($param['date_from']));
+        }
+        if (!empty($param['date_to'])) {
+            $query->where(self::$_table_name.'.created', '<=', self::time_to_val($param['date_to']));
         }
         
         // Pagination
