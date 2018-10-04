@@ -124,13 +124,10 @@ class Model_Order extends Model_Abstract {
      */
     public static function add_update($param)
     {
-        // Init
-        $adminId = !empty($param['admin_id']) ? $param['admin_id'] : '';
+        // Check code
         $id = !empty($param['id']) ? $param['id'] : 0;
         $self = array();
         $new = false;
-        
-        // Check code
         if (!empty($param['code'])) {
             $check = self::find('first', array(
                 'where' => array(
@@ -144,7 +141,6 @@ class Model_Order extends Model_Abstract {
             }
         }
         
-        
         // Check if exist User
         if (!empty($id)) {
             $self = self::find($id);
@@ -157,72 +153,71 @@ class Model_Order extends Model_Abstract {
             $new = true;
         }
         
-        // Upload image
-        if (!empty($_FILES)) {
-            $uploadResult = \Lib\Util::uploadImage(); 
-            if ($uploadResult['status'] != 200) {
-                self::setError($uploadResult['error']);
-                return false;
+        // Init
+        $adminId = !empty($param['admin_id']) ? $param['admin_id'] : '';
+        $totalQty = 0;
+        $totalPrice = 0;
+        $totalSellPrice = 0;
+        $totalOriginPrice = 0;
+        $created = time();
+        $detailOrder = !empty($param['detail_order']) ? json_decode($param['detail_order'], true) : array();
+        $productIds = array();
+        $customerPay = !empty($param['customer_pay']) ? $param['customer_pay'] : 0;
+        $customerId = !empty($param['customer_id']) ? $param['customer_id'] : 0;
+        $status = !empty($param['status']) ? $param['status'] : 0;
+        $detail = array();
+        $coupon = !empty($param['coupon']) ? $param['coupon'] : 0;
+        $paymentMethod = !empty($param['payment_method']) ? $param['payment_method'] : 0;
+        $notes = !empty($param['notes']) ? $param['notes'] : '';
+        
+        if (!empty($param['created'])) {
+            $created = self::time_to_val($param['created']);
+        }
+        if (!empty($detailOrder)) {
+            foreach ($detailOrder as $val) {
+                $productIds[] = $val['id'];
+                $totalQty += $val['qty'];
             }
-            $param['image'] = !empty($uploadResult['body']['image']) ? $uploadResult['body']['image'] : '';
+            $products = Lib\Arr::key_values(Model_Product::get_all(array(
+                'ids' => $productIds
+            )), 'id');
+            foreach ($detailOrder as $val) {
+                $tmpDetail = array();
+                if (!empty($products[$val['id']])) {
+                    $totalOriginPrice += $products[$val['id']]['origin_price']*$val['qty'];
+                    $totalSellPrice += $products[$val['id']]['sell_price']*$val['qty'];
+                    $tmpDetail['id'] = $val['id'];
+                    $tmpDetail['code'] = $products[$val['id']]['code'];
+                    $tmpDetail['name'] = $products[$val['id']]['name'];
+                    $tmpDetail['image'] = $products[$val['id']]['image'];
+                    $tmpDetail['qty'] = $val['qty'];
+                    $tmpDetail['price'] = $products[$val['id']]['sell_price'];
+                    $detail[] = $tmpDetail;
+                }
+            }
         }
         
         // Set data
-        $self->set('admin_id', $adminId);
-        if (!empty($param['name'])) {
-            $self->set('name', $param['name']);
-        }
         if (!empty($param['code']) && $new) {
             $self->set('code', $param['code']);
         }
-        if (isset($param['qty'])) {
-            $self->set('qty', $param['qty']);
+        if ($new) {
+            $self->set('created', $created);
         }
-        if (isset($param['origin_price'])) {
-            $self->set('origin_price', $param['origin_price']);
-        }
-        if (isset($param['sell_price'])) {
-            $self->set('sell_price', $param['sell_price']);
-        }
-        if (isset($param['is_inventory'])) {
-            $self->set('is_inventory', $param['is_inventory']);
-        }
-        if (isset($param['status'])) {
-            $self->set('status', $param['status']);
-        }
-        if (isset($param['is_allow_negative'])) {
-            $self->set('is_allow_negative', $param['is_allow_negative']);
-        }
-        if (isset($param['cate_id'])) {
-            $self->set('cate_id', $param['cate_id']);
-        }
-        if (isset($param['manufacture_id'])) {
-            $self->set('manufacture_id', $param['manufacture_id']);
-        }
-        if (isset($param['description'])) {
-            $self->set('description', $param['description']);
-        }
-        if (isset($param['image'])) {
-            $self->set('image', $param['image']);
-        }
-        if (isset($param['is_hot'])) {
-            $self->set('is_hot', $param['is_hot']);
-        }
-        if (isset($param['is_new'])) {
-            $self->set('is_new', $param['is_new']);
-        }
-        if (isset($param['is_feature'])) {
-            $self->set('is_feature', $param['is_feature']);
-        }
-        if (isset($param['is_display_web'])) {
-            $self->set('is_display_web', $param['is_display_web']);
-        }
-        if (isset($param['seo_description'])) {
-            $self->set('seo_description', $param['seo_description']);
-        }
-        if (isset($param['seo_keyword'])) {
-            $self->set('seo_keyword', $param['seo_keyword']);
-        }
+        $totalPrice = $totalSellPrice;
+        $self->set('admin_id', $adminId);
+        $self->set('total_qty', $totalQty);
+        $self->set('total_sell_price', $totalSellPrice);
+        $self->set('total_origin_price', $totalOriginPrice);
+        $self->set('total_price', $totalPrice);
+        $self->set('customer_pay', $customerPay);
+        $self->set('lack', $totalPrice - $customerPay);
+        $self->set('customer_id', $customerId);
+        $self->set('status', $status);
+        $self->set('detail', json_encode($detail));
+        $self->set('payment_method', $paymentMethod);
+        $self->set('coupon', $coupon);
+        $self->set('notes', $notes);
         
         // Save data
         if ($self->save()) {
@@ -230,7 +225,7 @@ class Model_Order extends Model_Abstract {
                 $self->id = self::cached_object($self)->_original['id'];
             }
             if (empty($param['code']) && $new) {
-                $code = Lib\Str::generate_code('SP', $self->id);
+                $code = Lib\Str::generate_code('HD', $self->id);
                 $self->set('code', $code);
                 $self->save();
             }

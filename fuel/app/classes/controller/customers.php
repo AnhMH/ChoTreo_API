@@ -34,4 +34,11 @@ class Controller_Customers extends \Controller_App {
     public function action_delete() {
         return \Bus\Customers_Delete::getInstance()->execute();
     }
+    
+    /**
+     * Customer all
+     */
+    public function action_autocomplete() {
+        return \Bus\Customers_AutoComplete::getInstance()->execute();
+    }
 }

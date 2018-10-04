@@ -41,4 +41,11 @@ class Controller_Products extends \Controller_App {
     public function action_disable() {
         return \Bus\Products_Disable::getInstance()->execute();
     }
+    
+    /**
+     * Product autocomplete
+     */
+    public function action_autocomplete() {
+        return \Bus\Products_AutoComplete::getInstance()->execute();
+    }
 }

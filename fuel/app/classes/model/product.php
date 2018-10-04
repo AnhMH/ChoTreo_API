@@ -312,4 +312,81 @@ class Model_Product extends Model_Abstract {
         }
         return false;
     }
+    
+    /**
+     * List Product
+     *
+     * @author AnhMH
+     * @param array $param Input data
+     * @return array|bool Detail Product or false if error
+     */
+    public static function auto_complete($param)
+    {
+        // Query
+        $query = DB::select(
+                self::$_table_name.'.*'
+            )
+            ->from(self::$_table_name)
+        ;
+        
+        // Filter
+        if (!empty($param['term'])) {
+            $query->where_open();
+            $query->where(self::$_table_name.'.name', 'LIKE', "%{$param['term']}%");
+            $query->or_where(self::$_table_name.'.code', 'LIKE', "%{$param['term']}%");
+            $query->where_close();
+        }
+        $query->where(self::$_table_name.'.disable', 0);
+        
+        // Pagination
+        if (!empty($param['page']) && $param['limit']) {
+            $offset = ($param['page'] - 1) * $param['limit'];
+            $query->limit($param['limit'])->offset($offset);
+        }
+        
+        // Sort
+        $query->order_by(self::$_table_name . '.id', 'DESC');
+        
+        // Get data
+        $data = $query->execute()->as_array();
+        
+        return $data;
+    }
+    
+    /**
+     * Get all
+     *
+     * @author AnhMH
+     * @param array $param Input data
+     * @return array|bool Detail Product or false if error
+     */
+    public static function get_all($param)
+    {
+        // Query
+        $query = DB::select(
+                self::$_table_name.'.*'
+            )
+            ->from(self::$_table_name)
+        ;
+        
+        // Filter
+        if (!empty($param['ids'])) {
+            $query->where(self::$_table_name.'.id', 'IN', $param['ids']);
+        }
+        $query->where(self::$_table_name.'.disable', 0);
+        
+        // Pagination
+        if (!empty($param['page']) && $param['limit']) {
+            $offset = ($param['page'] - 1) * $param['limit'];
+            $query->limit($param['limit'])->offset($offset);
+        }
+        
+        // Sort
+        $query->order_by(self::$_table_name . '.id', 'DESC');
+        
+        // Get data
+        $data = $query->execute()->as_array();
+        
+        return $data;
+    }
 }
