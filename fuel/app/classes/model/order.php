@@ -174,6 +174,7 @@ class Model_Order extends Model_Abstract {
         $totalPrice = 0;
         $totalSellPrice = 0;
         $totalOriginPrice = 0;
+        $lack = 0;
         $created = time();
         $detailOrder = !empty($param['detail_order']) ? json_decode($param['detail_order'], true) : array();
         $productIds = array();
@@ -220,13 +221,14 @@ class Model_Order extends Model_Abstract {
             $self->set('created', $created);
         }
         $totalPrice = $totalSellPrice;
+        $lack = ($totalPrice - $customerPay) > 0 ? ($totalPrice - $customerPay) : 0;
         $self->set('admin_id', $adminId);
         $self->set('total_qty', $totalQty);
         $self->set('total_sell_price', $totalSellPrice);
         $self->set('total_origin_price', $totalOriginPrice);
         $self->set('total_price', $totalPrice);
         $self->set('customer_pay', $customerPay);
-        $self->set('lack', $totalPrice - $customerPay);
+        $self->set('lack', $lack);
         $self->set('customer_id', $customerId);
         $self->set('status', $status);
         $self->set('detail', json_encode($detail));
