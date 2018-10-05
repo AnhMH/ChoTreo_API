@@ -217,9 +217,6 @@ class Model_Order extends Model_Abstract {
         if (!empty($param['code']) && $new) {
             $self->set('code', $param['code']);
         }
-        if ($new) {
-            $self->set('created', $created);
-        }
         $totalPrice = $totalSellPrice - $coupon;
         $lack = ($totalPrice - $customerPay) > 0 ? ($totalPrice - $customerPay) : 0;
         $self->set('admin_id', $adminId);
@@ -235,6 +232,7 @@ class Model_Order extends Model_Abstract {
         $self->set('payment_method', $paymentMethod);
         $self->set('coupon', $coupon);
         $self->set('notes', $notes);
+        $self->set('created', $created);
         
         // Save data
         if ($self->save()) {
