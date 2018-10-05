@@ -220,7 +220,7 @@ class Model_Order extends Model_Abstract {
         if ($new) {
             $self->set('created', $created);
         }
-        $totalPrice = $totalSellPrice;
+        $totalPrice = $totalSellPrice - $coupon;
         $lack = ($totalPrice - $customerPay) > 0 ? ($totalPrice - $customerPay) : 0;
         $self->set('admin_id', $adminId);
         $self->set('total_qty', $totalQty);
@@ -264,14 +264,14 @@ class Model_Order extends Model_Abstract {
         $data = array();
         $query = DB::select(
                 self::$_table_name.'.*',
-                array('cates.name', 'cate_name')
+                array('customers.name', 'customer_name')
             )
             ->from(self::$_table_name)
-            ->join('cates', 'LEFT')
-            ->on('cates.id', '=', self::$_table_name.'.cate_id')
+            ->join('customers', 'LEFT')
+            ->on('customers.id', '=', self::$_table_name.'.customer_id')
             ->where(self::$_table_name.'.id', $param['id'])
         ;
-        $data['product'] = $query->execute()->offsetGet(0);;
+        $data['order'] = $query->execute()->offsetGet(0);;
         
         return $data;
     }
