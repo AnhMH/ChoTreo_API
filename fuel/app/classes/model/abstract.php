@@ -194,7 +194,7 @@ class Model_Abstract extends Model {
      * @return int Returns the integer.
      */
     public static function date_to_val($date) {
-        return strtotime($date . '23:59:59');
+        return strtotime($date . ' 23:59:59');
     }
 
     /**

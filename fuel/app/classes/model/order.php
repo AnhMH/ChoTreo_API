@@ -31,7 +31,9 @@ class Model_Order extends Model_Abstract {
         'created',
         'updated',
         'disable',
-        'coupon'
+        'coupon',
+        'type',
+        'supplier_id'
     );
 
     protected static $_observers = array(
@@ -59,15 +61,29 @@ class Model_Order extends Model_Abstract {
     {
         // Query
         $query = DB::select(
-                self::$_table_name.'.*',
-                array('customers.name', 'customer_name')
+                self::$_table_name.'.*'
             )
             ->from(self::$_table_name)
-            ->join('customers', 'LEFT')
-            ->on('customers.id', '=', self::$_table_name.'.customer_id')
         ;
         
         // Filter
+        if (!empty($param['get_order_import'])) {
+            $query->select(
+                    array('suppliers.name', 'supplier_name')
+                )
+                ->join('suppliers', 'LEFT')
+                ->on('suppliers.id', '=', self::$_table_name.'.supplier_id')
+            ;
+            $query->where(self::$_table_name.'.type', 1);
+        } else {
+            $query->select(
+                    array('customers.name', 'customer_name')
+                )
+                ->join('customers', 'LEFT')
+                ->on('customers.id', '=', self::$_table_name.'.customer_id')
+            ;
+            $query->where(self::$_table_name.'.type', '!=', 1);
+        }
         if (!empty($param['keyword'])) {
             $query->or_where(self::$_table_name.'.code', 'LIKE', "%{$param['keyword']}%");
         }
@@ -86,11 +102,14 @@ class Model_Order extends Model_Abstract {
         if (!empty($param['customer_id'])) {
             $query->where(self::$_table_name.'.customer_id', $param['customer_id']);
         }
+        if (!empty($param['supplier_id'])) {
+            $query->where(self::$_table_name.'.supplier_id', $param['supplier_id']);
+        }
         if (!empty($param['date_from'])) {
             $query->where(self::$_table_name.'.created', '>=', self::time_to_val($param['date_from']));
         }
         if (!empty($param['date_to'])) {
-            $query->where(self::$_table_name.'.created', '<=', self::time_to_val($param['date_to']));
+            $query->where(self::$_table_name.'.created', '<=', self::date_to_val($param['date_to']));
         }
         
         // Pagination
