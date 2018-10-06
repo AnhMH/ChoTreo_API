@@ -34,4 +34,11 @@ class Controller_Suppliers extends \Controller_App {
     public function action_delete() {
         return \Bus\Suppliers_Delete::getInstance()->execute();
     }
+    
+    /**
+     * Supplier all
+     */
+    public function action_autocomplete() {
+        return \Bus\Suppliers_AutoComplete::getInstance()->execute();
+    }
 }

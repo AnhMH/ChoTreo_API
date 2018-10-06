@@ -138,14 +138,19 @@ class Model_Order extends Model_Abstract {
         $data = $query->execute()->as_array();
         $total = !empty($data) ? DB::count_last_query(self::$slave_db) : 0;
         $customers = array();
+        $suppliers = array();
         if (!empty($param['get_customers'])) {
             $customers = Model_Customer::get_all(array());
+        }
+        if (!empty($param['get_suppliers'])) {
+            $suppliers = Model_Supplier::get_all(array());
         }
         
         return array(
             'total' => $total,
             'data' => $data,
-            'customers' => $customers
+            'customers' => $customers,
+            'suppliers' => $suppliers
         );
     }
     
@@ -204,6 +209,9 @@ class Model_Order extends Model_Abstract {
         $coupon = !empty($param['coupon']) ? $param['coupon'] : 0;
         $paymentMethod = !empty($param['payment_method']) ? $param['payment_method'] : 0;
         $notes = !empty($param['notes']) ? $param['notes'] : '';
+        $type = !empty($param['type']) ? $param['type'] : 0;
+        $supplierId = !empty($param['supplier_id']) ? $param['supplier_id'] : 0;
+        $preCode = !empty($param['type']) ? 'PN' : 'HD';
         
         if (!empty($param['created'])) {
             $created = self::time_to_val($param['created']);
@@ -252,6 +260,8 @@ class Model_Order extends Model_Abstract {
         $self->set('coupon', $coupon);
         $self->set('notes', $notes);
         $self->set('created', $created);
+        $self->set('type', $type);
+        $self->set('supplier_id', $supplierId);
         
         // Save data
         if ($self->save()) {
@@ -259,7 +269,7 @@ class Model_Order extends Model_Abstract {
                 $self->id = self::cached_object($self)->_original['id'];
             }
             if (empty($param['code']) && $new) {
-                $code = Lib\Str::generate_code('HD', $self->id);
+                $code = Lib\Str::generate_code($preCode, $self->id);
                 $self->set('code', $code);
                 $self->save();
             }
@@ -281,11 +291,14 @@ class Model_Order extends Model_Abstract {
         $data = array();
         $query = DB::select(
                 self::$_table_name.'.*',
-                array('customers.name', 'customer_name')
+                array('customers.name', 'customer_name'),
+                array('suppliers.name', 'supplier_name')
             )
             ->from(self::$_table_name)
             ->join('customers', 'LEFT')
             ->on('customers.id', '=', self::$_table_name.'.customer_id')
+            ->join('suppliers', 'LEFT')
+            ->on('suppliers.id', '=', self::$_table_name.'.supplier_id')
             ->where(self::$_table_name.'.id', $param['id'])
         ;
         $data['order'] = $query->execute()->offsetGet(0);;
