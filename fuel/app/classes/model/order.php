@@ -234,7 +234,7 @@ class Model_Order extends Model_Abstract {
                     $tmpDetail['name'] = $products[$val['id']]['name'];
                     $tmpDetail['image'] = $products[$val['id']]['image'];
                     $tmpDetail['qty'] = $val['qty'];
-                    $tmpDetail['price'] = $products[$val['id']]['sell_price'];
+                    $tmpDetail['price'] = !empty($type) ? $products[$val['id']]['origin_price'] : $products[$val['id']]['sell_price'];
                     $detail[] = $tmpDetail;
                 }
             }
@@ -244,7 +244,7 @@ class Model_Order extends Model_Abstract {
         if (!empty($param['code']) && $new) {
             $self->set('code', $param['code']);
         }
-        $totalPrice = $totalSellPrice - $coupon;
+        $totalPrice = !empty($type) ? ($totalOriginPrice - $coupon) : ($totalSellPrice - $coupon);
         $lack = ($totalPrice - $customerPay) > 0 ? ($totalPrice - $customerPay) : 0;
         $self->set('admin_id', $adminId);
         $self->set('total_qty', $totalQty);
