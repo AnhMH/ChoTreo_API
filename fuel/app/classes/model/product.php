@@ -389,4 +389,76 @@ class Model_Product extends Model_Abstract {
         
         return $data;
     }
+    
+    /**
+     * List Product
+     *
+     * @author AnhMH
+     * @param array $param Input data
+     * @return array|bool Detail Product or false if error
+     */
+    public static function get_inventory($param)
+    {
+        // Query
+        $query = DB::select(
+                self::$_table_name.'.*',
+                array('cates.name', 'cate_name')
+            )
+            ->from(self::$_table_name)
+            ->join('cates', 'LEFT')
+            ->on('cates.id', '=', self::$_table_name.'.cate_id')
+            ->where(self::$_table_name.'.is_inventory', 1)
+            ->where(self::$_table_name.'.disable', 0)
+        ;
+        
+        // Filter
+        if (!empty($param['keyword'])) {
+            $query->where_open();
+            $query->where(self::$_table_name.'.name', 'LIKE', "%{$param['keyword']}%");
+            $query->or_where(self::$_table_name.'.code', 'LIKE', "%{$param['keyword']}%");
+            $query->where_close();
+        }
+        if (!empty($param['cate_id'])) {
+            $cateIds = explode(',', $param['cate_id']);
+            $query->where(self::$_table_name.'.cate_id', 'IN', $cateIds);
+        }
+        if (!empty($param['option3'])) {
+            if ($param['option3'] == 1) {
+                $query->where(self::$_table_name.'.qty', '>', 0);
+            } else {
+                $query->where(self::$_table_name.'.qty', '<=', 0);
+            }
+        }
+        
+        // Pagination
+//        if (!empty($param['page']) && $param['limit']) {
+//            $offset = ($param['page'] - 1) * $param['limit'];
+//            $query->limit($param['limit'])->offset($offset);
+//        }
+        
+        // Sort
+        if (!empty($param['sort'])) {
+            if (!self::checkSort($param['sort'])) {
+                self::errorParamInvalid('sort');
+                return false;
+            }
+
+            $sortExplode = explode('-', $param['sort']);
+            if ($sortExplode[0] == 'created') {
+                $sortExplode[0] = self::$_table_name . '.created';
+            }
+            $query->order_by($sortExplode[0], $sortExplode[1]);
+        } else {
+            $query->order_by(self::$_table_name . '.id', 'DESC');
+        }
+        
+        // Get data
+        $data = $query->execute()->as_array();
+//        $total = !empty($data) ? DB::count_last_query(self::$slave_db) : 0;
+        
+        return array(
+//            'total' => $total,
+            'data' => $data
+        );
+    }
 }

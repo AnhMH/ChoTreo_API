@@ -48,4 +48,11 @@ class Controller_Products extends \Controller_App {
     public function action_autocomplete() {
         return \Bus\Products_AutoComplete::getInstance()->execute();
     }
+    
+    /**
+     * Product get inventory
+     */
+    public function action_getinventory() {
+        return \Bus\Products_GetInventory::getInstance()->execute();
+    }
 }
