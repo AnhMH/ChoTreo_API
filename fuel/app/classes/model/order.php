@@ -11,7 +11,7 @@ use Fuel\Core\DB;
  * @author AnhMH
  */
 class Model_Order extends Model_Abstract {
-    
+
     /** @var array $_properties field of table */
     protected static $_properties = array(
         'id',
@@ -35,14 +35,13 @@ class Model_Order extends Model_Abstract {
         'type',
         'supplier_id'
     );
-
     protected static $_observers = array(
         'Orm\Observer_CreatedAt' => array(
-            'events'          => array('before_insert'),
+            'events' => array('before_insert'),
             'mysql_timestamp' => false,
         ),
         'Orm\Observer_UpdatedAt' => array(
-            'events'          => array('before_update'),
+            'events' => array('before_update'),
             'mysql_timestamp' => false,
         ),
     );
@@ -57,67 +56,66 @@ class Model_Order extends Model_Abstract {
      * @param array $param Input data
      * @return array|bool Detail Order or false if error
      */
-    public static function get_list($param)
-    {
+    public static function get_list($param) {
         // Query
         $query = DB::select(
-                self::$_table_name.'.*'
-            )
-            ->from(self::$_table_name)
+                        self::$_table_name . '.*'
+                )
+                ->from(self::$_table_name)
         ;
-        
+
         // Filter
         if (!empty($param['get_order_import'])) {
             $query->select(
-                    array('suppliers.name', 'supplier_name')
-                )
-                ->join('suppliers', 'LEFT')
-                ->on('suppliers.id', '=', self::$_table_name.'.supplier_id')
+                            array('suppliers.name', 'supplier_name')
+                    )
+                    ->join('suppliers', 'LEFT')
+                    ->on('suppliers.id', '=', self::$_table_name . '.supplier_id')
             ;
-            $query->where(self::$_table_name.'.type', 1);
+            $query->where(self::$_table_name . '.type', 1);
         } else {
             $query->select(
-                    array('customers.name', 'customer_name')
-                )
-                ->join('customers', 'LEFT')
-                ->on('customers.id', '=', self::$_table_name.'.customer_id')
+                            array('customers.name', 'customer_name')
+                    )
+                    ->join('customers', 'LEFT')
+                    ->on('customers.id', '=', self::$_table_name . '.customer_id')
             ;
-            $query->where(self::$_table_name.'.type', '!=', 1);
+            $query->where(self::$_table_name . '.type', '!=', 1);
         }
         if (!empty($param['keyword'])) {
-            $query->or_where(self::$_table_name.'.code', 'LIKE', "%{$param['keyword']}%");
+            $query->or_where(self::$_table_name . '.code', 'LIKE', "%{$param['keyword']}%");
         }
         if (isset($param['option1']) && $param['option1'] != '') {
             if ($param['option1'] == 1) {
-                $query->where(self::$_table_name.'.disable', 1);
+                $query->where(self::$_table_name . '.disable', 1);
             } else {
-                $query->where(self::$_table_name.'.disable', 0);
+                $query->where(self::$_table_name . '.disable', 0);
             }
             if ($param['option1'] == 2) {
-                $query->where(self::$_table_name.'.lack', '>', 0);
+                $query->where(self::$_table_name . '.lack', '>', 0);
             }
         } else {
-            $query->where(self::$_table_name.'.disable', 0);
+            $query->where(self::$_table_name . '.disable', 0);
         }
         if (!empty($param['customer_id'])) {
-            $query->where(self::$_table_name.'.customer_id', $param['customer_id']);
+            $query->where(self::$_table_name . '.customer_id', $param['customer_id']);
         }
         if (!empty($param['supplier_id'])) {
-            $query->where(self::$_table_name.'.supplier_id', $param['supplier_id']);
+            $query->where(self::$_table_name . '.supplier_id', $param['supplier_id']);
         }
         if (!empty($param['date_from'])) {
-            $query->where(self::$_table_name.'.created', '>=', self::time_to_val($param['date_from']));
+            $query->where(self::$_table_name . '.created', '>=', self::time_to_val($param['date_from']));
         }
         if (!empty($param['date_to'])) {
-            $query->where(self::$_table_name.'.created', '<=', self::date_to_val($param['date_to']));
+            $query->where(self::$_table_name . '.created', '<=', self::date_to_val($param['date_to']));
         }
-        
+
         // Pagination
         if (!empty($param['page']) && $param['limit']) {
             $offset = ($param['page'] - 1) * $param['limit'];
             $query->limit($param['limit'])->offset($offset);
         }
-        
+
         // Sort
         if (!empty($param['sort'])) {
             if (!self::checkSort($param['sort'])) {
@@ -133,7 +131,7 @@ class Model_Order extends Model_Abstract {
         } else {
             $query->order_by(self::$_table_name . '.id', 'DESC');
         }
-        
+
         // Get data
         $data = $query->execute()->as_array();
         $total = !empty($data) ? DB::count_last_query(self::$slave_db) : 0;
@@ -145,7 +143,7 @@ class Model_Order extends Model_Abstract {
         if (!empty($param['get_suppliers'])) {
             $suppliers = Model_Supplier::get_all(array());
         }
-        
+
         return array(
             'total' => $total,
             'data' => $data,
@@ -153,7 +151,7 @@ class Model_Order extends Model_Abstract {
             'suppliers' => $suppliers
         );
     }
-    
+
     /**
      * Add update info
      *
@@ -161,25 +159,24 @@ class Model_Order extends Model_Abstract {
      * @param array $param Input data
      * @return int|bool User ID or false if error
      */
-    public static function add_update($param)
-    {
+    public static function add_update($param) {
         // Check code
         $id = !empty($param['id']) ? $param['id'] : 0;
         $self = array();
         $new = false;
         if (!empty($param['code'])) {
             $check = self::find('first', array(
-                'where' => array(
-                    'code' => $param['code'],
-                    array('id', '!=', $id)
-                )
+                        'where' => array(
+                            'code' => $param['code'],
+                            array('id', '!=', $id)
+                        )
             ));
             if (!empty($check)) {
                 self::errorDuplicate('code');
                 return false;
             }
         }
-        
+
         // Check if exist User
         if (!empty($id)) {
             $self = self::find($id);
@@ -191,7 +188,7 @@ class Model_Order extends Model_Abstract {
             $self = new self;
             $new = true;
         }
-        
+
         // Init
         $adminId = !empty($param['admin_id']) ? $param['admin_id'] : '';
         $totalQty = 0;
@@ -212,6 +209,9 @@ class Model_Order extends Model_Abstract {
         $type = !empty($param['type']) ? $param['type'] : 0;
         $supplierId = !empty($param['supplier_id']) ? $param['supplier_id'] : 0;
         $preCode = !empty($param['type']) ? 'PN' : 'HD';
+        $products = array();
+        $errorProduct = false;
+        $orderDetail = !empty($self['detail']) ? Lib\Arr::key_values(json_decode($self['detail'], true), 'id') : array();
         
         if (!empty($param['created'])) {
             $created = self::time_to_val($param['created']);
@@ -221,14 +221,37 @@ class Model_Order extends Model_Abstract {
                 $productIds[] = $val['id'];
                 $totalQty += $val['qty'];
             }
+            if (!empty($orderDetail)) {
+                foreach ($orderDetail as $val) {
+                    $productIds[] = $val['id'];
+                }
+            }
             $products = Lib\Arr::key_values(Model_Product::get_all(array(
-                'ids' => $productIds
-            )), 'id');
+                                'ids' => $productIds
+                            )), 'id');
             foreach ($detailOrder as $val) {
                 $tmpDetail = array();
                 if (!empty($products[$val['id']])) {
-                    $totalOriginPrice += $products[$val['id']]['origin_price']*$val['qty'];
-                    $totalSellPrice += $products[$val['id']]['sell_price']*$val['qty'];
+                    $beforeQty = 0;
+                    if (!empty($orderDetail[$val['id']])) {
+                        $beforeQty = $orderDetail[$val['id']]['qty'];
+                        unset($orderDetail[$val['id']]);
+                    }
+                    if ($type == 1) {
+                        $products[$val['id']]['qty'] = $products[$val['id']]['qty'] + $val['qty'] - $beforeQty;
+                    } else {
+                        $products[$val['id']]['qty'] = $products[$val['id']]['qty'] + $beforeQty;
+                        if (empty($products[$val['id']]['is_allow_negative']) && $products[$val['id']]['qty'] < $val['qty']) {
+                            $errorProduct = true;
+                            self::errorOther(self::ERROR_CODE_OTHER_1, 'product_qty', "Không đủ hàng tồn. <strong>{$products[$val['id']]['name']}</strong> chỉ còn <strong>{$products[$val['id']]['qty']}</strong> sản phẩm");
+                            break;
+                        } else {
+                            $products[$val['id']]['qty'] = $products[$val['id']]['qty'] - $val['qty'];
+                        }
+                    }
+
+                    $totalOriginPrice += $products[$val['id']]['origin_price'] * $val['qty'];
+                    $totalSellPrice += $products[$val['id']]['sell_price'] * $val['qty'];
                     $tmpDetail['id'] = $val['id'];
                     $tmpDetail['code'] = $products[$val['id']]['code'];
                     $tmpDetail['name'] = $products[$val['id']]['name'];
@@ -239,7 +262,10 @@ class Model_Order extends Model_Abstract {
                 }
             }
         }
-        
+        if ($errorProduct) {
+            return false;
+        }
+
         // Set data
         if (!empty($param['code']) && $new) {
             $self->set('code', $param['code']);
@@ -262,7 +288,7 @@ class Model_Order extends Model_Abstract {
         $self->set('created', $created);
         $self->set('type', $type);
         $self->set('supplier_id', $supplierId);
-        
+
         // Save data
         if ($self->save()) {
             if (empty($self->id)) {
@@ -273,12 +299,33 @@ class Model_Order extends Model_Abstract {
                 $self->set('code', $code);
                 $self->save();
             }
+            $productData = array();
+            if (!empty($products)) {
+                foreach ($products as $p) {
+                    if (!empty($orderDetail[$p['id']])) {
+                        if ($type == 1) {
+                            $p['qty'] = $p['qty'] - $orderDetail[$p['id']]['qty'];
+                        } else {
+                            $p['qty'] = $p['qty'] + $orderDetail[$p['id']]['qty'];
+                        }
+                    }
+                    $productData[] = array(
+                        'id' => $p['id'],
+                        'qty' => $p['qty']
+                    );
+                }
+            }
+            if (!empty($productData)) {
+                self::batchInsert('products', $productData, array(
+                    'qty' => DB::expr('VALUES(qty)')
+                ));
+            }
             return $self->id;
         }
-        
+
         return false;
     }
-    
+
     /**
      * Get detail
      *
@@ -286,26 +333,24 @@ class Model_Order extends Model_Abstract {
      * @param array $param Input data
      * @return array
      */
-    public static function get_detail($param)
-    {
+    public static function get_detail($param) {
         $data = array();
         $query = DB::select(
-                self::$_table_name.'.*',
-                array('customers.name', 'customer_name'),
-                array('suppliers.name', 'supplier_name')
-            )
-            ->from(self::$_table_name)
-            ->join('customers', 'LEFT')
-            ->on('customers.id', '=', self::$_table_name.'.customer_id')
-            ->join('suppliers', 'LEFT')
-            ->on('suppliers.id', '=', self::$_table_name.'.supplier_id')
-            ->where(self::$_table_name.'.id', $param['id'])
+                        self::$_table_name . '.*', array('customers.name', 'customer_name'), array('suppliers.name', 'supplier_name')
+                )
+                ->from(self::$_table_name)
+                ->join('customers', 'LEFT')
+                ->on('customers.id', '=', self::$_table_name . '.customer_id')
+                ->join('suppliers', 'LEFT')
+                ->on('suppliers.id', '=', self::$_table_name . '.supplier_id')
+                ->where(self::$_table_name . '.id', $param['id'])
         ;
-        $data['order'] = $query->execute()->offsetGet(0);;
-        
+        $data['order'] = $query->execute()->offsetGet(0);
+        ;
+
         return $data;
     }
-    
+
     /**
      * Delete
      *
@@ -313,10 +358,9 @@ class Model_Order extends Model_Abstract {
      * @param array $param Input data
      * @return Int|bool
      */
-    public static function del($param)
-    {
+    public static function del($param) {
         $delete = self::deleteRow(self::$_table_name, array(
-            'id' => $param['id']
+                    'id' => $param['id']
         ));
         if ($delete) {
             return $param['id'];
@@ -324,7 +368,7 @@ class Model_Order extends Model_Abstract {
             return 0;
         }
     }
-    
+
     /**
      * Disable
      *
@@ -332,8 +376,7 @@ class Model_Order extends Model_Abstract {
      * @param array $param Input data
      * @return Int|bool
      */
-    public static function disable($param)
-    {
+    public static function disable($param) {
         $disable = !empty($param['disable']) ? 1 : 0;
         $self = self::find($param['id']);
         if (empty($self)) {
@@ -349,4 +392,5 @@ class Model_Order extends Model_Abstract {
         }
         return false;
     }
+
 }
