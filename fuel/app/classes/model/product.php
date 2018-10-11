@@ -87,6 +87,9 @@ class Model_Product extends Model_Abstract {
             $cateIds = explode(',', $param['cate_id']);
             $query->where(self::$_table_name.'.cate_id', 'IN', $cateIds);
         }
+        if (!empty($param['admin_id'])) {
+            $query->where(self::$_table_name . '.admin_id', $param['admin_id']);
+        }
         
         // Pagination
         if (!empty($param['page']) && $param['limit']) {
@@ -337,6 +340,9 @@ class Model_Product extends Model_Abstract {
             $query->where_close();
         }
         $query->where(self::$_table_name.'.disable', 0);
+        if (!empty($param['admin_id'])) {
+            $query->where(self::$_table_name . '.admin_id', $param['admin_id']);
+        }
         
         // Pagination
         if (!empty($param['page']) && $param['limit']) {
@@ -374,6 +380,9 @@ class Model_Product extends Model_Abstract {
             $query->where(self::$_table_name.'.id', 'IN', $param['ids']);
         }
         $query->where(self::$_table_name.'.disable', 0);
+        if (!empty($param['admin_id'])) {
+            $query->where(self::$_table_name . '.admin_id', $param['admin_id']);
+        }
         
         // Pagination
         if (!empty($param['page']) && $param['limit']) {
@@ -428,6 +437,9 @@ class Model_Product extends Model_Abstract {
             } else {
                 $query->where(self::$_table_name.'.qty', '<=', 0);
             }
+        }
+        if (!empty($param['admin_id'])) {
+            $query->where(self::$_table_name . '.admin_id', $param['admin_id']);
         }
         
         // Pagination

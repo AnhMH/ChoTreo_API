@@ -70,6 +70,9 @@ class Model_Supplier extends Model_Abstract {
             $offset = ($param['page'] - 1) * $param['limit'];
             $query->limit($param['limit'])->offset($offset);
         }
+        if (!empty($param['admin_id'])) {
+            $query->where(self::$_table_name . '.admin_id', $param['admin_id']);
+        }
         
         // Sort
         if (!empty($param['sort'])) {
@@ -240,6 +243,9 @@ class Model_Supplier extends Model_Abstract {
             $query->or_where(self::$_table_name.'.code', 'LIKE', "%{$param['keyword']}%");
             $query->where_close();
         }
+        if (!empty($param['admin_id'])) {
+            $query->where(self::$_table_name . '.admin_id', $param['admin_id']);
+        }
         
         // Pagination
         if (!empty($param['page']) && $param['limit']) {
@@ -278,6 +284,9 @@ class Model_Supplier extends Model_Abstract {
             $query->where(self::$_table_name.'.name', 'LIKE', "%{$param['keyword']}%");
             $query->or_where(self::$_table_name.'.code', 'LIKE', "%{$param['keyword']}%");
             $query->where_close();
+        }
+        if (!empty($param['admin_id'])) {
+            $query->where(self::$_table_name . '.admin_id', $param['admin_id']);
         }
         
         // Pagination
