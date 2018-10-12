@@ -1,12 +1,12 @@
 <?php 
 return array(	
-	'upload_dir' => realpath('../../' . dirname(basename(__FILE__))) . DS . 'upload' . DS,
-	'img_dir' => realpath('../../' . dirname(basename(__FILE__))) . DS . 'upload' . DS . 'img' . DS,
-	'path' => realpath('../../' . dirname(basename(__FILE__))) . DS . 'upload' . DS . 'img' . DS . date('Y' . DS . 'm' . DS . 'd') . DS,
+	'upload_dir' => '/home/hoangan1/img.chotreo.com/',
+	'img_dir' => '/home/hoangan1/img.chotreo.com/',
+	'path' => '/home/hoangan1/img.chotreo.com/' . date('Y' . DS . 'm' . DS . 'd') . DS,
 	'auto_process' => false,
 	'normalize' => true,
 	'change_case' => 'lower',
 	'randomize' => true,
 	'ext_whitelist' => array('jpeg', 'jpg', 'gif', 'png', 'mp4', 'flv'),
-        'max_size' => 1 * 512, // 512KB
+        'max_size' => 1 * 1024 * 1024, // 1MB
 );
