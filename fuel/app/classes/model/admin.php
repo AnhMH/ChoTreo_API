@@ -172,4 +172,46 @@ class Model_Admin extends Model_Abstract {
         }
         return false;
     }
+    
+    /**
+     * Register Admin
+     *
+     * @author AnhMH
+     * @param array $param Input data
+     * @return array|bool Detail Admin or false if error
+     */
+    public static function register($param)
+    {
+        $self = array();
+        
+        $check = self::find('first', array(
+            'where' => array(
+                'email' => $param['register_email']
+            )
+        ));
+        if (!empty($check)) {
+            self::errorDuplicate('email', "Email {$param['register_email']} đã được đăng ký.");
+            return false;
+        }
+        
+        $self = new self;
+        $self->set('name', $param['register_name']);
+        $self->set('email', $param['register_email']);
+        $self->set('password', $param['register_password']);
+        $self->set('type', 0);
+        $self->set('account', '');
+        
+        if ($self->save()) {
+            if (empty($self->id)) {
+                $self->id = self::cached_object($self)->_original['id'];
+            }
+            $self['token'] = Model_Authenticate::addupdate(array(
+                'user_id' => $self->id,
+                'regist_type' => 'admin'
+            ));
+            return $self;
+        }
+        
+        return false;
+    }
 }

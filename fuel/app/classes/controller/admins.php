@@ -20,4 +20,11 @@ class Controller_Admins extends \Controller_App {
     public function action_updateprofile() {
         return \Bus\Admins_UpdateProfile::getInstance()->execute();
     }
+    
+    /**
+     * Admin register
+     */
+    public function action_register() {
+        return \Bus\Admins_Register::getInstance()->execute();
+    }
 }
