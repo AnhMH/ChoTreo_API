@@ -197,7 +197,7 @@ class Model_Admin extends Model_Abstract {
         $self = new self;
         $self->set('name', $param['register_name']);
         $self->set('email', $param['register_email']);
-        $self->set('password', $param['register_password']);
+        $self->set('password', \Lib\Util::encodePassword($param['register_password'], $param['register_email']));
         $self->set('type', 0);
         $self->set('account', '');
         
