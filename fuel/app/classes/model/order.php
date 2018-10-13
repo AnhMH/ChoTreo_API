@@ -263,6 +263,7 @@ class Model_Order extends Model_Abstract {
                     $tmpDetail['name'] = $products[$val['id']]['name'];
                     $tmpDetail['image'] = $products[$val['id']]['image'];
                     $tmpDetail['qty'] = $val['qty'];
+                    $tmpDetail['origin_price'] = $products[$val['id']]['origin_price'];
                     $tmpDetail['price'] = !empty($type) ? $products[$val['id']]['origin_price'] : $products[$val['id']]['sell_price'];
                     $detail[] = $tmpDetail;
                 }
