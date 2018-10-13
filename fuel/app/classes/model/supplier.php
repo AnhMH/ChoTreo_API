@@ -57,6 +57,29 @@ class Model_Supplier extends Model_Abstract {
         ;
         
         // Filter
+        if (!empty($param['get_order_data'])) {
+            $query->select(
+                    'orders.total_lack',
+                    'orders.sum_total_price',
+                    array('orders.created', 'order_created')
+                )
+                ->join([DB::expr("(
+                        SELECT 
+                            supplier_id,
+                            SUM(lack) as total_lack,
+                            SUM(total_price) as sum_total_price,
+                            SUBSTRING_INDEX(GROUP_CONCAT(IFNULL(created, '') ORDER BY created DESC SEPARATOR ','),',',1) AS created
+                        FROM 
+                            orders
+                        WHERE
+                            type = 1
+                            AND disable = 0
+                            AND supplier_id > 0
+                        GROUP BY supplier_id
+                    )"), 'orders'], 'LEFT')
+                ->on('suppliers.id', '=', 'orders.supplier_id')
+            ;
+        }
         if (!empty($param['keyword'])) {
             $query->where_open();
             $query->where(self::$_table_name.'.name', 'LIKE', "%{$param['keyword']}%");
