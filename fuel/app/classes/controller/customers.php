@@ -41,4 +41,11 @@ class Controller_Customers extends \Controller_App {
     public function action_autocomplete() {
         return \Bus\Customers_AutoComplete::getInstance()->execute();
     }
+    
+    /**
+     * Customer all
+     */
+    public function action_all() {
+        return \Bus\Customers_All::getInstance()->execute();
+    }
 }

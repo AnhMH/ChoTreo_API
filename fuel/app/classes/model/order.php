@@ -97,7 +97,7 @@ class Model_Order extends Model_Abstract {
         } else {
             $query->where(self::$_table_name . '.disable', 0);
         }
-        if (!empty($param['customer_id'])) {
+        if (isset($param['customer_id']) && $param['customer_id'] >= 0) {
             $query->where(self::$_table_name . '.customer_id', $param['customer_id']);
         }
         if (!empty($param['supplier_id'])) {
@@ -137,7 +137,10 @@ class Model_Order extends Model_Abstract {
 
         // Get data
         $data = $query->execute()->as_array();
-        $total = !empty($data) ? DB::count_last_query(self::$slave_db) : 0;
+        $total = 0;
+        if (!empty($param['page']) && !empty($param['limit'])) {
+            $total = !empty($data) ? DB::count_last_query(self::$slave_db) : 0;
+        }
         $customers = array();
         $suppliers = array();
         if (!empty($param['get_customers'])) {
@@ -395,5 +398,5 @@ class Model_Order extends Model_Abstract {
         }
         return false;
     }
-
+    
 }
