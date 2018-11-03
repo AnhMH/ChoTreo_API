@@ -10,16 +10,20 @@ use Fuel\Core\DB;
  * @version 1.0
  * @author AnhMH
  */
-class Model_Cate extends Model_Abstract {
+class Model_Slider extends Model_Abstract {
     
     /** @var array $_properties field of table */
     protected static $_properties = array(
         'id',
-        'name',
-        'parent_id',
-        'admin_id',
+        'type',
+        'image',
+        'link',
+        'text',
+        'stt',
         'created',
         'updated',
+        'disable',
+        'admin_id'
     );
 
     protected static $_observers = array(
@@ -34,14 +38,14 @@ class Model_Cate extends Model_Abstract {
     );
 
     /** @var array $_table_name name of table */
-    protected static $_table_name = 'cates';
+    protected static $_table_name = 'sliders';
 
     /**
-     * List Cate
+     * List Slider
      *
      * @author AnhMH
      * @param array $param Input data
-     * @return array|bool Detail Cate or false if error
+     * @return array|bool Detail Slider or false if error
      */
     public static function get_list($param)
     {
@@ -52,18 +56,13 @@ class Model_Cate extends Model_Abstract {
             ->from(self::$_table_name)
         ;
         
-        // Filter
-        if (!empty($param['keyword'])) {
-            $query->where_open();
-            $query->where(self::$_table_name.'.name', 'LIKE', "%{$param['keyword']}%");
-            $query->or_where(self::$_table_name.'.code', 'LIKE', "%{$param['keyword']}%");
-            $query->where_close();
-        }
-        
         // Pagination
         if (!empty($param['page']) && $param['limit']) {
             $offset = ($param['page'] - 1) * $param['limit'];
             $query->limit($param['limit'])->offset($offset);
+        }
+        if (!empty($param['admin_id'])) {
+            $query->where(self::$_table_name . '.admin_id', $param['admin_id']);
         }
         
         // Sort
@@ -93,33 +92,6 @@ class Model_Cate extends Model_Abstract {
     }
     
     /**
-     * List Cate
-     *
-     * @author AnhMH
-     * @param array $param Input data
-     * @return array|bool Detail Cate or false if error
-     */
-    public static function get_all($param)
-    {
-        // Query
-        $query = DB::select(
-                self::$_table_name.'.*'
-            )
-            ->from(self::$_table_name)
-        ;
-        
-        // Filter
-        if (!empty($param['get_root'])) {
-            $query->where(self::$_table_name.'.parent_id', 0);
-        }
-        
-        // Get data
-        $data = $query->execute()->as_array();
-        
-        return $data;
-    }
-    
-    /**
      * Add update info
      *
      * @author AnhMH
@@ -131,29 +103,15 @@ class Model_Cate extends Model_Abstract {
         // Init
         $adminId = !empty($param['admin_id']) ? $param['admin_id'] : '';
         $id = !empty($param['id']) ? $param['id'] : 0;
+        $time = time();
         $self = array();
         $new = false;
-        
-        // Check code
-        if (!empty($param['name'])) {
-            $check = self::find('first', array(
-                'where' => array(
-                    'name' => $param['name'],
-                    array('id', '!=', $id)
-                )
-            ));
-            if (!empty($check)) {
-                self::errorDuplicate('name');
-                return false;
-            }
-        }
-        
         
         // Check if exist User
         if (!empty($id)) {
             $self = self::find($id);
             if (empty($self)) {
-                self::errorNotExist('cate_id');
+                self::errorNotExist('slider_id');
                 return false;
             }
         } else {
@@ -161,13 +119,38 @@ class Model_Cate extends Model_Abstract {
             $new = true;
         }
         
+        // Upload image
+        if (!empty($_FILES)) {
+            $uploadResult = \Lib\Util::uploadImage(); 
+            if ($uploadResult['status'] != 200) {
+                self::setError($uploadResult['error']);
+                return false;
+            }
+            $param['image'] = !empty($uploadResult['body']['image']) ? $uploadResult['body']['image'] : '';
+        }
+        
         // Set data
         $self->set('admin_id', $adminId);
-        if (!empty($param['name'])) {
-            $self->set('name', $param['name']);
+        if (!empty($param['type'])) {
+            $self->set('type', $param['type']);
         }
-        if (isset($param['parent_id'])) {
-            $self->set('parent_id', $param['parent_id']);
+        if (!empty($param['image'])) {
+            $self->set('image', $param['image']);
+        }
+        if (!empty($param['link'])) {
+            $self->set('link', $param['link']);
+        }
+        if (!empty($param['text'])) {
+            $self->set('text', $param['text']);
+        }
+        if (!empty($param['stt'])) {
+            $self->set('stt', $param['stt']);
+        }
+        if ($new) {
+            $self->set('created', $time);
+            $self->set('updated', $time);
+        } else {
+            $self->set('updated', $time);
         }
         
         // Save data
@@ -177,7 +160,6 @@ class Model_Cate extends Model_Abstract {
             }
             return $self->id;
         }
-        
         return false;
     }
     
@@ -192,7 +174,7 @@ class Model_Cate extends Model_Abstract {
     {
         $data = array();
         
-        $data['product'] = self::find($param['id']);
+        $data = self::find($param['id']);
         
         return $data;
     }
@@ -206,50 +188,35 @@ class Model_Cate extends Model_Abstract {
      */
     public static function del($param)
     {
-        if (empty($param['delete_product'])) {
-            $product = Model_Product::find('first', array(
-                'where' => array(
-                    'cate_id' => $param['id']
-                )
-            ));
-            if (!empty($product)) {
-                return -1;
-            }
-        } else {
-            self::deleteRow('products', array(
-                'cate_id' => $param['id']
-            ));
-        }
-        
-        self::deleteRow(self::$_table_name, array(
+        $delete = self::deleteRow(self::$_table_name, array(
             'id' => $param['id']
         ));
-        
-        return $param['id'];
+        if ($delete) {
+            return $param['id'];
+        } else {
+            return 0;
+        }
     }
     
     /**
-     * Disable
+     * Get all
      *
      * @author AnhMH
      * @param array $param Input data
-     * @return Int|bool
+     * @return array|bool Detail Cate or false if error
      */
-    public static function disable($param)
+    public static function get_all($param)
     {
-        $disable = !empty($param['disable']) ? 1 : 0;
-        $self = self::find($param['id']);
-        if (empty($self)) {
-            self::errorNotExist('product_id');
-            return false;
-        }
-        $self->set('disable', $disable);
-        if ($self->save()) {
-            if (empty($self->id)) {
-                $self->id = self::cached_object($self)->_original['id'];
-            }
-            return $self->id;
-        }
-        return false;
+        // Query
+        $query = DB::select(
+                self::$_table_name.'.*'
+            )
+            ->from(self::$_table_name)
+        ;
+        
+        // Get data
+        $data = $query->execute()->as_array();
+        
+        return $data;
     }
 }

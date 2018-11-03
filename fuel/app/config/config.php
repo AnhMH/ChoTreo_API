@@ -337,7 +337,9 @@ return array(
     'authorize' => true,
     'unauthorize_url' => array(
         'admins/login',
-        'admins/register'
+        'admins/register',
+        'settings/getfrontdata',
+        'settings/gethomedata',
     ),
     'admin_authorize_url' => array(),
     'unauthorize_basic_token_url' => array(

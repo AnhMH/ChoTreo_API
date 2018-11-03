@@ -139,4 +139,39 @@ class Model_Setting extends Model_Abstract {
         
         return $data;
     }
+    
+    /**
+     * List Setting
+     *
+     * @author AnhMH
+     * @param array $param Input data
+     * @return array|bool Detail Setting or false if error
+     */
+    public static function get_frontdata($param)
+    {
+        $data = array();
+        
+        // Get categories
+        $data['cates'] = Model_Cate::get_all(array('get_root' => 1));
+        
+        return $data;
+    }
+    
+    /**
+     * List Setting
+     *
+     * @author AnhMH
+     * @param array $param Input data
+     * @return array|bool Detail Setting or false if error
+     */
+    public static function get_homedata($param)
+    {
+        $data = array();
+        
+        // Get categories
+        $data['sliders'] = Model_Slider::get_all(array());
+        $data['products'] = Model_Product::get_all(array());
+        
+        return $data;
+    }
 }
