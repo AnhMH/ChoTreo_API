@@ -55,4 +55,11 @@ class Controller_Products extends \Controller_App {
     public function action_getinventory() {
         return \Bus\Products_GetInventory::getInstance()->execute();
     }
+    
+    /**
+     * Product get detail for front
+     */
+    public function action_getdetailforfront() {
+        return \Bus\Products_GetDetailForFront::getInstance()->execute();
+    }
 }

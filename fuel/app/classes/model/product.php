@@ -36,6 +36,7 @@ class Model_Product extends Model_Abstract {
         'created',
         'updated',
         'disable',
+        'url'
     );
 
     protected static $_observers = array(
@@ -472,5 +473,35 @@ class Model_Product extends Model_Abstract {
 //            'total' => $total,
             'data' => $data
         );
+    }
+    
+    /**
+     * Get detail
+     *
+     * @author AnhMH
+     * @param array $param Input data
+     * @return array
+     */
+    public static function get_detail_for_front($param)
+    {
+        $data = array();
+        $query = DB::select(
+                self::$_table_name.'.*',
+                array('cates.name', 'cate_name'),
+                array('cates.url', 'cate_url'),
+                array('admins.name', 'admin_name')
+            )
+            ->from(self::$_table_name)
+            ->join('cates', 'LEFT')
+            ->on('cates.id', '=', self::$_table_name.'.cate_id')
+            ->join('admins', 'LEFT')
+            ->on('admins.id', '=', self::$_table_name.'.admin_id')
+            ->where(self::$_table_name.'.url', $param['url'])
+        ;
+        $data['product'] = $query->execute()->offsetGet(0);
+        
+        $data['relate_products'] = self::get_all(array());
+        
+        return $data;
     }
 }
