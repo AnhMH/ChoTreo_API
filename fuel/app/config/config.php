@@ -342,6 +342,7 @@ return array(
         'settings/gethomedata',
         'products/getdetailforfront',
         'cates/getdetailforfront',
+        'products/list'
     ),
     'admin_authorize_url' => array(),
     'unauthorize_basic_token_url' => array(
