@@ -48,4 +48,11 @@ class Controller_Cates extends \Controller_App {
     public function action_disable() {
         return \Bus\Cates_Disable::getInstance()->execute();
     }
+    
+    /**
+     * Cate get detail for front
+     */
+    public function action_getdetailforfront() {
+        return \Bus\Cates_GetDetailForFront::getInstance()->execute();
+    }
 }

@@ -20,6 +20,7 @@ class Model_Cate extends Model_Abstract {
         'admin_id',
         'created',
         'updated',
+        'url'
     );
 
     protected static $_observers = array(
@@ -251,5 +252,27 @@ class Model_Cate extends Model_Abstract {
             return $self->id;
         }
         return false;
+    }
+    
+    /**
+     * List Cate
+     *
+     * @author AnhMH
+     * @param array $param Input data
+     * @return array|bool Detail Cate or false if error
+     */
+    public static function get_detail_for_front($param)
+    {
+        $data = array();
+        $cate = self::find('first', array(
+            'where' => array(
+                'url' => $param['url']
+            )
+        ));
+        if (!empty($cate)) {
+            $data['cate'] = $cate;
+            $data['products'] = Model_Product::get_list(array('cate_id' => $cate['id']));
+        }
+        return $data;
     }
 }
