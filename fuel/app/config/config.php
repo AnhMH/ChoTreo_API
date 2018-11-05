@@ -344,7 +344,8 @@ return array(
         'cates/getdetailforfront',
         'products/list',
         'contact/addupdate',
-        'customers/login'
+        'customers/login',
+        'customers/addupdate',
     ),
     'admin_authorize_url' => array(),
     'unauthorize_basic_token_url' => array(

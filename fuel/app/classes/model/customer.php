@@ -209,6 +209,13 @@ class Model_Customer extends Model_Abstract {
                 $self->set('code', $code);
                 $self->save();
             }
+            if (!empty($param['get_login'])) {
+                $self['token'] = Model_Authenticate::addupdate(array(
+                    'user_id' => $self->id,
+                    'regist_type' => 'user'
+                ));
+                return $self;
+            }
             return $self->id;
         }
         
