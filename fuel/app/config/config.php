@@ -343,7 +343,8 @@ return array(
         'products/getdetailforfront',
         'cates/getdetailforfront',
         'products/list',
-        'contact/addupdate'
+        'contact/addupdate',
+        'customers/login'
     ),
     'admin_authorize_url' => array(),
     'unauthorize_basic_token_url' => array(

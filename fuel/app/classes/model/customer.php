@@ -25,7 +25,9 @@ class Model_Customer extends Model_Abstract {
         'gender',
         'admin_id',
         'created',
-        'updated'
+        'updated',
+        'disable',
+        'password'
     );
 
     protected static $_observers = array(
@@ -193,6 +195,9 @@ class Model_Customer extends Model_Abstract {
         if (isset($param['gender'])) {
             $self->set('gender', $param['gender']);
         }
+        if (!empty($param['password']) && !empty($param['email'])) {
+            $self->set('password', \Lib\Util::encodePassword($param['password'], $param['email']));
+        }
         
         // Save data
         if ($self->save()) {
@@ -329,5 +334,37 @@ class Model_Customer extends Model_Abstract {
         $data = $query->execute()->as_array();
         
         return $data;
+    }
+    
+    /**
+     * Login
+     *
+     * @author AnhMH
+     * @param array $param Input data
+     * @return array|bool Detail Admin or false if error
+     */
+    public static function get_login($param)
+    {
+        $login = array();
+        $login = self::find('first', array(
+            'where' => array(
+                'email' => $param['email'],
+                'password' => \Lib\Util::encodePassword($param['password'], $param['email'])
+            )
+        ));
+        
+        if (!empty($login)) {
+            if (empty($login['disable'])) {
+                $login['token'] = Model_Authenticate::addupdate(array(
+                    'user_id' => $login['id'],
+                    'regist_type' => 'user'
+                ));
+                return $login;
+            }
+            static::errorOther(static::ERROR_CODE_OTHER_1, 'User is disabled');
+            return false;
+        }
+        static::errorOther(static::ERROR_CODE_AUTH_ERROR, 'Email/Password');
+        return false;
     }
 }

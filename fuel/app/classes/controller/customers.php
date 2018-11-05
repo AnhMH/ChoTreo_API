@@ -48,4 +48,11 @@ class Controller_Customers extends \Controller_App {
     public function action_all() {
         return \Bus\Customers_All::getInstance()->execute();
     }
+    
+    /**
+     * Customer login
+     */
+    public function action_login() {
+        return \Bus\Customers_Login::getInstance()->execute();
+    }
 }
