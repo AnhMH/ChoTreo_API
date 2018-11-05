@@ -10,7 +10,7 @@ namespace Bus;
  * @version 1.0
  * @author AnhMH
  */
-class Admins_Login extends BusAbstract
+class Customers_Login extends BusAbstract
 {
     /** @var array $_required field require */
     protected $_required = array(
