@@ -263,4 +263,32 @@ class Model_Admin extends Model_Abstract {
 
         return $data;
     }
+    
+    /**
+     * Get detail for front
+     *
+     * @author AnhMH
+     * @param array $param Input data
+     * @return array|bool Detail Admin or false if error
+     */
+    public static function get_detail_for_front($param)
+    {
+        // Init
+        $data = array();
+        
+        // Get admin data
+        $admin = self::find('first', array(
+            'where' => array(
+                'url' => $param['url']
+            )
+        ));
+        
+        if (!empty($admin)) {
+            $data['shop'] = $admin;
+            $param['admin_id'] = $admin['id'];
+            $data['products'] = Model_Product::get_all($param);
+        }
+        
+        return $data;
+    }
 }

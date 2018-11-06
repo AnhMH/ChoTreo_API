@@ -348,6 +348,7 @@ return array(
         'customers/addupdate',
         'products/detail',
         'orders/addupdate',
+        'admins/getdetailforfront',
     ),
     'admin_authorize_url' => array(),
     'unauthorize_basic_token_url' => array(

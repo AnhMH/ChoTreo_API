@@ -27,4 +27,11 @@ class Controller_Admins extends \Controller_App {
     public function action_register() {
         return \Bus\Admins_Register::getInstance()->execute();
     }
+    
+    /**
+     * Get detail for front
+     */
+    public function action_getdetailforfront() {
+        return \Bus\Admins_GetDetailForFront::getInstance()->execute();
+    }
 }
