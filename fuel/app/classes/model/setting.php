@@ -171,6 +171,7 @@ class Model_Setting extends Model_Abstract {
         // Get categories
         $data['sliders'] = Model_Slider::get_all(array());
         $data['products'] = Model_Product::get_all(array());
+        $data['shops'] = Model_Admin::get_all(array());
         
         return $data;
     }
