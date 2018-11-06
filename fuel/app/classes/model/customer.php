@@ -156,6 +156,20 @@ class Model_Customer extends Model_Abstract {
             }
         }
         
+        // Check email
+        if (!empty($param['email'])) {
+            $check = self::find('first', array(
+                'where' => array(
+                    'email' => $param['email'],
+                    array('id', '!=', $id)
+                )
+            ));
+            if (!empty($check)) {
+                self::errorDuplicate('email');
+                return false;
+            }
+        }
+        
         
         // Check if exist User
         if (!empty($id)) {

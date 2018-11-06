@@ -131,7 +131,7 @@ abstract class BusAbstract {
         self::ERROR_CODE_FIELD_NUMERIC_MAX => 'The maximum numeric value of %s must be %s',
         self::ERROR_CODE_FIELD_NUMERIC_BETWEEN => 'The %s may not contain more than %s characters',
         self::ERROR_CODE_FIELD_NOT_EXIST => 'The %s does not exist',
-        self::ERROR_CODE_FIELD_DUPLICATE => 'The %s is duplicate data',
+        self::ERROR_CODE_FIELD_DUPLICATE => '%s đã được sử dụng.',
         self::ERROR_CODE_DENIED_ERROR => 'The action have been denied by system',
         self::ERROR_CODE_FIELD_FORMAT_KATAKANA => 'The %s must be a katakana string',
         self::ERROR_CODE_FIELD_FORMAT_HIRAGANA => 'The %s must be a hiragana string',

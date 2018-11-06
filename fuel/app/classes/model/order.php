@@ -33,7 +33,11 @@ class Model_Order extends Model_Abstract {
         'disable',
         'coupon',
         'type',
-        'supplier_id'
+        'supplier_id',
+        'name',
+        'address',
+        'phone',
+        'from_front'
     );
     protected static $_observers = array(
         'Orm\Observer_CreatedAt' => array(
@@ -166,6 +170,11 @@ class Model_Order extends Model_Abstract {
      * @return int|bool User ID or false if error
      */
     public static function add_update($param) {
+        // Order from front
+        if (!empty($param['from_front'])) {
+            return self::add_from_front($param);
+        }
+        
         // Check code
         $id = !empty($param['id']) ? $param['id'] : 0;
         $self = array();
@@ -183,16 +192,23 @@ class Model_Order extends Model_Abstract {
             }
         }
 
-        // Check if exist User
+        // Check if exist
         if (!empty($id)) {
             $self = self::find($id);
             if (empty($self)) {
-                self::errorNotExist('user_id');
+                self::errorNotExist('order_id');
                 return false;
             }
         } else {
             $self = new self;
             $new = true;
+        }
+        
+        if (!empty($param['save_account'])) {
+            $param['customer_id'] = Model_Customer::add_update($param);
+            if (empty($param['customer_id'])) {
+                return false;
+            }
         }
 
         // Init
@@ -218,6 +234,10 @@ class Model_Order extends Model_Abstract {
         $products = array();
         $errorProduct = false;
         $orderDetail = !empty($self['detail']) ? Lib\Arr::key_values(json_decode($self['detail'], true), 'id') : array();
+        $fromFront = !empty($param['from_front']) ? $param['from_front'] : '';
+        $name = !empty($param['name']) ? $param['name'] : '';
+        $address = !empty($param['address']) ? $param['address'] : '';
+        $phone = !empty($param['phone']) ? $param['phone'] : '';
         
         if (!empty($param['created'])) {
             $created = self::time_to_val($param['created']);
@@ -295,6 +315,10 @@ class Model_Order extends Model_Abstract {
         $self->set('created', $created);
         $self->set('type', $type);
         $self->set('supplier_id', $supplierId);
+        $self->set('from_front', $fromFront);
+        $self->set('name', $name);
+        $self->set('address', $address);
+        $self->set('phone', $phone);
 
         // Save data
         if ($self->save()) {
@@ -397,6 +421,154 @@ class Model_Order extends Model_Abstract {
             }
             return $self->id;
         }
+        return false;
+    }
+    
+    /**
+     * Add update info
+     *
+     * @author AnhMH
+     * @param array $param Input data
+     * @return int|bool User ID or false if error
+     */
+    public static function add_from_front($param) {
+        // Add new customer
+        if (!empty($param['save_account'])) {
+            $param['customer_id'] = Model_Customer::add_update($param);
+            if (empty($param['customer_id'])) {
+                return false;
+            }
+        }
+
+        // Init
+        $new = true;
+        $totalQty = 0;
+        $totalPrice = 0;
+        $totalSellPrice = 0;
+        $totalOriginPrice = 0;
+        $lack = 0;
+        $created = time();
+        $detailOrder = !empty($param['detail_order']) ? json_decode($param['detail_order'], true) : array();
+        $productIds = array();
+        $customerPay = !empty($param['customer_pay']) ? $param['customer_pay'] : 0;
+        $customerId = !empty($param['login_user_id']) ? $param['login_user_id'] : 0;
+        $status = 0;
+        $detail = array();
+        $coupon = !empty($param['coupon']) ? $param['coupon'] : 0;
+        $paymentMethod = !empty($param['payment_method']) ? $param['payment_method'] : 0;
+        $notes = !empty($param['notes']) ? $param['notes'] : '';
+        $type = 0;
+        $supplierId = !empty($param['supplier_id']) ? $param['supplier_id'] : 0;
+        $preCode = !empty($param['type']) ? 'PN' : 'HD';
+        $products = array();
+        $errorProduct = false;
+        $fromFront = !empty($param['from_front']) ? $param['from_front'] : '';
+        $name = !empty($param['name']) ? $param['name'] : '';
+        $address = !empty($param['address']) ? $param['address'] : '';
+        $phone = !empty($param['phone']) ? $param['phone'] : '';
+        
+        if (!empty($detailOrder)) {
+            foreach ($detailOrder as $val) {
+                $productIds[] = $val['id'];
+                $totalQty += $val['qty'];
+            }
+            $products = Lib\Arr::key_values(Model_Product::get_all(array(
+                                'ids' => $productIds
+                            )), 'id');
+            foreach ($detailOrder as $val) {
+                $tmpDetail = array();
+                if (!empty($products[$val['id']])) {
+                    $pAdminId = $products[$val['id']]['admin_id'];
+                    if (empty($products[$val['id']]['is_allow_negative']) && $products[$val['id']]['qty'] < $val['qty']) {
+                        $errorProduct = true;
+                        self::errorOther(self::ERROR_CODE_OTHER_1, 'product_qty', "Không đủ hàng tồn. <strong>{$products[$val['id']]['name']}</strong> chỉ còn <strong>{$products[$val['id']]['qty']}</strong> sản phẩm");
+                        break;
+                    } else {
+                        $products[$val['id']]['qty'] = $products[$val['id']]['qty'] - $val['qty'];
+                    }
+
+//                    $totalOriginPrice += $products[$val['id']]['origin_price'] * $val['qty'];
+//                    $totalSellPrice += $products[$val['id']]['sell_price'] * $val['qty'];
+                    $tmpDetail['id'] = $val['id'];
+                    $tmpDetail['code'] = $products[$val['id']]['code'];
+                    $tmpDetail['name'] = $products[$val['id']]['name'];
+                    $tmpDetail['image'] = $products[$val['id']]['image'];
+                    $tmpDetail['qty'] = $val['qty'];
+                    $tmpDetail['origin_price'] = $products[$val['id']]['origin_price'];
+                    $tmpDetail['price'] = $products[$val['id']]['sell_price'];
+                    $detail[$pAdminId][] = $tmpDetail;
+                }
+            }
+        }
+        if ($errorProduct) {
+            return false;
+        }
+
+        // Set data
+        if (!empty($detail)) {
+            foreach ($detail as $k => $v) {
+                $self = new self;
+                $adminId = $k;
+                $totalOriginPrice = 0;
+                $totalSellPrice = 0;
+                foreach ($v as $p) {
+                    $totalOriginPrice += $p['origin_price'] * $p['qty'];
+                    $totalSellPrice += $p['price'] * $p['qty'];
+                }
+                $totalPrice = $totalSellPrice - $coupon;
+                $lack = ($totalPrice - $customerPay) > 0 ? ($totalPrice - $customerPay) : 0;
+                $self->set('admin_id', $adminId);
+                $self->set('total_qty', $totalQty);
+                $self->set('total_sell_price', $totalSellPrice);
+                $self->set('total_origin_price', $totalOriginPrice);
+                $self->set('total_price', $totalPrice);
+                $self->set('customer_pay', $customerPay);
+                $self->set('lack', $lack);
+                $self->set('customer_id', $customerId);
+                $self->set('status', $status);
+                $self->set('detail', json_encode($v));
+                $self->set('payment_method', $paymentMethod);
+                $self->set('coupon', $coupon);
+                $self->set('notes', $notes);
+                $self->set('created', $created);
+                $self->set('type', $type);
+                $self->set('supplier_id', $supplierId);
+                $self->set('from_front', $fromFront);
+                $self->set('name', $name);
+                $self->set('address', $address);
+                $self->set('phone', $phone);
+
+                // Save data
+                if ($self->save()) {
+                    if (empty($self->id)) {
+                        $self->id = self::cached_object($self)->_original['id'];
+                    }
+                    if (empty($param['code']) && $new) {
+                        $code = Lib\Str::generate_code($preCode, $self->id);
+                        $self->set('code', $code);
+                        $self->save();
+                    }
+                }
+            }
+            
+            $productData = array();
+            if (!empty($products)) {
+                foreach ($products as $p) {
+                    $productData[] = array(
+                        'id' => $p['id'],
+                        'qty' => $p['qty']
+                    );
+                }
+            }
+            if (!empty($productData)) {
+                self::batchInsert('products', $productData, array(
+                    'qty' => DB::expr('VALUES(qty)')
+                ));
+            }
+            return true;
+        }
+        
+
         return false;
     }
     

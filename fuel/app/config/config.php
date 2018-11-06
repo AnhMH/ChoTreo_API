@@ -346,6 +346,8 @@ return array(
         'contact/addupdate',
         'customers/login',
         'customers/addupdate',
+        'products/detail',
+        'orders/addupdate',
     ),
     'admin_authorize_url' => array(),
     'unauthorize_basic_token_url' => array(
