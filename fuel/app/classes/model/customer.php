@@ -91,7 +91,7 @@ class Model_Customer extends Model_Abstract {
             $query->or_where(self::$_table_name.'.phone', 'LIKE', "%{$param['keyword']}%");
             $query->where_close();
         }
-        if (!empty($param['admin_id'])) {
+        if (!empty($param['admin_id']) && $param['vip_type'] != 99) {
             $query->where(self::$_table_name . '.admin_id', $param['admin_id']);
         }
         

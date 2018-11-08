@@ -229,9 +229,11 @@ abstract class BusAbstract {
             }
             if ($authDetail['regist_type'] == 'admin') {
                 $data['admin_id'] = $authDetail['user_id'];
+                $data['vip_type'] = $authDetail['vip_type'];
             } else {
                 $data['admin_id'] = 0;
                 $data['login_user_id'] = $authDetail['user_id'];
+                $data['vip_type'] = 0;
             }
             if (in_array(\Uri::string(), \Config::get('admin_authorize_url')) && \Config::get('authorize') == true) {
                 if ($data['admin_id'] == 0) {

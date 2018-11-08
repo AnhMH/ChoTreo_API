@@ -113,7 +113,7 @@ class Model_Order extends Model_Abstract {
         if (!empty($param['date_to'])) {
             $query->where(self::$_table_name . '.created', '<=', self::date_to_val($param['date_to']));
         }
-        if (!empty($param['admin_id'])) {
+        if (!empty($param['admin_id']) && $param['vip_type'] != 99) {
             $query->where(self::$_table_name . '.admin_id', $param['admin_id']);
         }
 

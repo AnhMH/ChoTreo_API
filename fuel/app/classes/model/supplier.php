@@ -93,7 +93,7 @@ class Model_Supplier extends Model_Abstract {
             $offset = ($param['page'] - 1) * $param['limit'];
             $query->limit($param['limit'])->offset($offset);
         }
-        if (!empty($param['admin_id'])) {
+        if (!empty($param['admin_id']) && $param['vip_type'] != 99) {
             $query->where(self::$_table_name . '.admin_id', $param['admin_id']);
         }
         

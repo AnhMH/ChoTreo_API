@@ -36,7 +36,9 @@ class Model_Product extends Model_Abstract {
         'created',
         'updated',
         'disable',
-        'url'
+        'url',
+        'detail',
+        'is_confirm'
     );
 
     protected static $_observers = array(
@@ -88,7 +90,7 @@ class Model_Product extends Model_Abstract {
             $cateIds = explode(',', $param['cate_id']);
             $query->where(self::$_table_name.'.cate_id', 'IN', $cateIds);
         }
-        if (!empty($param['admin_id'])) {
+        if (!empty($param['admin_id']) && $param['vip_type'] != 99) {
             $query->where(self::$_table_name . '.admin_id', $param['admin_id']);
         }
         
@@ -136,6 +138,7 @@ class Model_Product extends Model_Abstract {
         // Init
         $adminId = !empty($param['admin_id']) ? $param['admin_id'] : '';
         $id = !empty($param['id']) ? $param['id'] : 0;
+        $url = '';
         $self = array();
         $new = false;
         
@@ -178,8 +181,10 @@ class Model_Product extends Model_Abstract {
         
         // Set data
         $self->set('admin_id', $adminId);
+        $self->set('is_confirm', 0);
         if (!empty($param['name'])) {
             $self->set('name', $param['name']);
+            $url = \Lib\Str::convertURL($param['name']);
         }
         if (!empty($param['code']) && $new) {
             $self->set('code', $param['code']);
@@ -211,6 +216,9 @@ class Model_Product extends Model_Abstract {
         if (isset($param['description'])) {
             $self->set('description', $param['description']);
         }
+        if (isset($param['detail'])) {
+            $self->set('detail', $param['detail']);
+        }
         if (isset($param['image'])) {
             $self->set('image', $param['image']);
         }
@@ -238,9 +246,18 @@ class Model_Product extends Model_Abstract {
             if (empty($self->id)) {
                 $self->id = self::cached_object($self)->_original['id'];
             }
+            $save = false;
             if (empty($param['code']) && $new) {
                 $code = Lib\Str::generate_code('SP', $self->id);
                 $self->set('code', $code);
+                $save = true;
+                $self->save();
+            }
+            if (!empty($url)) {
+                $self->set('url', $url.'-'.$self->id);
+                $save = true;
+            }
+            if ($save) {
                 $self->save();
             }
             return $self->id;
@@ -489,7 +506,8 @@ class Model_Product extends Model_Abstract {
                 self::$_table_name.'.*',
                 array('cates.name', 'cate_name'),
                 array('cates.url', 'cate_url'),
-                array('admins.name', 'admin_name')
+                array('admins.name', 'admin_name'),
+                array('admins.url', 'admin_url')
             )
             ->from(self::$_table_name)
             ->join('cates', 'LEFT')
