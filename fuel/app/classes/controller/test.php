@@ -16,9 +16,10 @@ class Controller_Test extends \Controller_App {
      */
     public function action_index() {
         $param = array();
-        $data = Model_Customer::get_list($param);
+        $data = \Lib\AccessTrade::getOffers();
         echo '<pre>';
         print_r($data);
+//        Model_Atvn_Coupon::import();
         die();
     }
 
@@ -33,6 +34,16 @@ class Controller_Test extends \Controller_App {
         $account = $_GET['acc'];
         $pass = $_GET['pw'];
         echo \Lib\Util::encodePassword($pass, $account);
+    }
+    
+    /**
+     * import coupon from attvn
+     *
+     * @access  public
+     * @return  Response
+     */
+    public function action_attvnimportcoupon() {
+        Model_Atvn_Coupon::import();
     }
     
 }

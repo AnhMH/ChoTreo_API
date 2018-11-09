@@ -5,6 +5,10 @@ $envConf = array(
     'test_email' => '', // will send to this email for testing 
     'api_check_security' => true,
     'api_request_minute' => 24 * 60,
+    'accesstrade' => array(
+        'access_key' => 'GKbYMT1dQsIJ4bcwwG_FJ2s_3XPYX0BZ',
+        'secret_key' => '@=ajq7302o=6ogrlf-#e8cjxrryb%)og'
+    )
 );
 
 if (isset($_SERVER['SERVER_NAME'])) {
