@@ -349,6 +349,7 @@ return array(
         'products/detail',
         'orders/addupdate',
         'admins/getdetailforfront',
+        'coupons/list',
     ),
     'admin_authorize_url' => array(),
     'unauthorize_basic_token_url' => array(

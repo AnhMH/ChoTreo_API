@@ -184,6 +184,11 @@ class Model_Setting extends Model_Abstract {
             'limit' => 6, 
             'page' => 1
         ));
+        $data['coupons'] = Model_Atvn_Coupon::get_all(array(
+            'limit' => 6, 
+            'page' => 1,
+            'from_front' => 1
+        ));
         return $data;
     }
 }

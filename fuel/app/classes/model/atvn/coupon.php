@@ -27,7 +27,8 @@ class Model_Atvn_Coupon extends Model_Abstract {
         'merchant',
         'name',
         'start_time',
-        'disable'
+        'disable',
+        'created'
     );
 
     protected static $_observers = array(
@@ -127,6 +128,7 @@ class Model_Atvn_Coupon extends Model_Abstract {
         $data = \Lib\AccessTrade::getOffers();
         $updateField = array();
         $addUpdateData = array();
+        $time = time();
         foreach (self::$_properties as $val) {
             $updateField[$val] = DB::expr("VALUES({$val})");
         }
@@ -145,12 +147,113 @@ class Model_Atvn_Coupon extends Model_Abstract {
                     'link' => $val['link'],
                     'merchant' => $val['merchant'],
                     'name' => $val['name'],
-                    'start_time' => self::time_to_val($val['start_time'])
+                    'start_time' => self::time_to_val($val['start_time']),
+                    'created' => $time
                 );
                 $addUpdateData[] = $tmp;
             }
             self::batchInsert(self::$_table_name, $addUpdateData, $updateField);
         }
         return true;
+    }
+    
+    /**
+     * Get list
+     * @author AnhMH
+     * @param array $param Input data
+     * @return array|bool Detail Product or false if error
+     */
+    public static function get_list($param)
+    {
+        // Query
+        $query = DB::select(
+                self::$_table_name.'.*'
+            )
+            ->from(self::$_table_name)
+        ;
+        
+        // Filter
+        if (!empty($param['from_front'])) {
+            $query->where(self::$_table_name . '.disable', 0);
+        }
+        
+        // Pagination
+        if (!empty($param['page']) && $param['limit']) {
+            $offset = ($param['page'] - 1) * $param['limit'];
+            $query->limit($param['limit'])->offset($offset);
+        }
+        
+        // Sort
+        if (!empty($param['sort'])) {
+            if (!self::checkSort($param['sort'])) {
+                self::errorParamInvalid('sort');
+                return false;
+            }
+
+            $sortExplode = explode('-', $param['sort']);
+            if ($sortExplode[0] == 'created') {
+                $sortExplode[0] = self::$_table_name . '.created';
+            }
+            $query->order_by($sortExplode[0], $sortExplode[1]);
+        } else {
+            $query->order_by(self::$_table_name . '.created', 'DESC');
+        }
+        
+        // Get data
+        $data = $query->execute()->as_array();
+        $total = !empty($data) ? DB::count_last_query(self::$slave_db) : 0;
+        
+        return array(
+            'total' => $total,
+            'data' => $data
+        );
+    }
+    
+    /**
+     * Get all
+     * @author AnhMH
+     * @param array $param Input data
+     * @return array|bool Detail Product or false if error
+     */
+    public static function get_all($param)
+    {
+        // Query
+        $query = DB::select(
+                self::$_table_name.'.*'
+            )
+            ->from(self::$_table_name)
+        ;
+        
+        // Filter
+        if (!empty($param['from_front'])) {
+            $query->where(self::$_table_name . '.disable', 0);
+        }
+        
+        // Pagination
+        if (!empty($param['page']) && $param['limit']) {
+            $offset = ($param['page'] - 1) * $param['limit'];
+            $query->limit($param['limit'])->offset($offset);
+        }
+        
+        // Sort
+        if (!empty($param['sort'])) {
+            if (!self::checkSort($param['sort'])) {
+                self::errorParamInvalid('sort');
+                return false;
+            }
+
+            $sortExplode = explode('-', $param['sort']);
+            if ($sortExplode[0] == 'created') {
+                $sortExplode[0] = self::$_table_name . '.created';
+            }
+            $query->order_by($sortExplode[0], $sortExplode[1]);
+        } else {
+            $query->order_by(self::$_table_name . '.created', 'DESC');
+        }
+        
+        // Get data
+        $data = $query->execute()->as_array();
+        
+        return $data;
     }
 }
