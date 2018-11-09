@@ -397,10 +397,13 @@ class Model_Product extends Model_Abstract {
         if (!empty($param['ids'])) {
             $query->where(self::$_table_name.'.id', 'IN', $param['ids']);
         }
-        $query->where(self::$_table_name.'.disable', 0);
+        
         if (!empty($param['admin_id'])) {
             $query->where(self::$_table_name . '.admin_id', $param['admin_id']);
         }
+        
+        $query->where(self::$_table_name.'.disable', 0);
+        $query->where(self::$_table_name.'.is_display_web', 1);
         
         // Pagination
         if (!empty($param['page']) && $param['limit']) {
@@ -409,7 +412,20 @@ class Model_Product extends Model_Abstract {
         }
         
         // Sort
-        $query->order_by(self::$_table_name . '.id', 'DESC');
+        if (!empty($param['sort'])) {
+            if (!self::checkSort($param['sort'])) {
+                self::errorParamInvalid('sort');
+                return false;
+            }
+
+            $sortExplode = explode('-', $param['sort']);
+            if ($sortExplode[0] == 'created') {
+                $sortExplode[0] = self::$_table_name . '.created';
+            }
+            $query->order_by($sortExplode[0], $sortExplode[1]);
+        } else {
+            $query->order_by(self::$_table_name . '.id', 'DESC');
+        }
         
         // Get data
         $data = $query->execute()->as_array();

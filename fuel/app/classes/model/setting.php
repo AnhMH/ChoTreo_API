@@ -170,12 +170,18 @@ class Model_Setting extends Model_Abstract {
         
         // Get categories
         $data['sliders'] = Model_Slider::get_all(array());
-        $data['products'] = Model_Product::get_all(array(
-            'limit' => 8, 
-            'page' => 1
+        $data['feature_products'] = Model_Product::get_all(array(
+            'limit' => 6,
+            'page' => 1,
+            'sort' => 'is_feature-desc'
+        ));
+        $data['new_products'] = Model_Product::get_all(array(
+            'limit' => 8,
+            'page' => 1,
+            'sort' => 'is_new-desc'
         ));
         $data['shops'] = Model_Admin::get_all(array(
-            'limit' => 8, 
+            'limit' => 6, 
             'page' => 1
         ));
         return $data;

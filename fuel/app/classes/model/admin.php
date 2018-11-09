@@ -235,6 +235,8 @@ class Model_Admin extends Model_Abstract {
         ;
 
         // Filter
+        $query->where(self::$_table_name.'.url', 'IS NOT', NULL);
+        $query->where(self::$_table_name.'.url', '!=', '');
 
         // Pagination
         if (!empty($param['page']) && $param['limit']) {
