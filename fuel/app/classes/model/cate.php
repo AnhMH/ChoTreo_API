@@ -271,7 +271,8 @@ class Model_Cate extends Model_Abstract {
         ));
         if (!empty($cate)) {
             $data['cate'] = $cate;
-            $data['products'] = Model_Product::get_list(array('cate_id' => $cate['id']));
+            $param['cate_id'] = $cate['id'];
+            $data['products'] = Model_Product::get_list($param);
         }
         return $data;
     }

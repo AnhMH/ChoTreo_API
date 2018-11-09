@@ -125,6 +125,7 @@ class Model_Admin extends Model_Abstract {
     {
         $adminId = !empty($param['admin_id']) ? $param['admin_id'] : '';
         $admin = self::find($adminId);
+        $time = time();
         if (empty($admin)) {
             self::errorNotExist('admin_id', $adminId);
             return false;
@@ -165,6 +166,7 @@ class Model_Admin extends Model_Abstract {
         if (!empty($param['url'])) {
             $admin->set('url', $param['url']);
         }
+        $admin->set('updated', $time);
         
         // Save data
         if ($admin->save()) {
@@ -187,6 +189,7 @@ class Model_Admin extends Model_Abstract {
     public static function register($param)
     {
         $self = array();
+        $time = time();
         
         $check = self::find('first', array(
             'where' => array(
@@ -204,6 +207,8 @@ class Model_Admin extends Model_Abstract {
         $self->set('password', \Lib\Util::encodePassword($param['register_password'], $param['register_email']));
         $self->set('type', 0);
         $self->set('account', '');
+        $self->set('created', $time);
+        $self->set('updated', $time);
         
         if ($self->save()) {
             if (empty($self->id)) {
@@ -288,7 +293,7 @@ class Model_Admin extends Model_Abstract {
         if (!empty($admin)) {
             $data['shop'] = $admin;
             $param['admin_id'] = $admin['id'];
-            $data['products'] = Model_Product::get_all($param);
+            $data['products'] = Model_Product::get_list($param);
         }
         
         return $data;

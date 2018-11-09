@@ -93,6 +93,9 @@ class Model_Product extends Model_Abstract {
         if (!empty($param['admin_id']) && $param['vip_type'] != 99) {
             $query->where(self::$_table_name . '.admin_id', $param['admin_id']);
         }
+        if (!empty($param['from_front'])) {
+            $query->where(self::$_table_name . '.is_display_web', 1);
+        }
         
         // Pagination
         if (!empty($param['page']) && $param['limit']) {
