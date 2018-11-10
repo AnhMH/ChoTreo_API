@@ -183,7 +183,9 @@ class Model_Product extends Model_Abstract {
         }
         
         // Set data
-        $self->set('admin_id', $adminId);
+        if ($new) {
+            $self->set('admin_id', $adminId);
+        }
         $self->set('is_confirm', 0);
         if (!empty($param['name'])) {
             $self->set('name', $param['name']);
