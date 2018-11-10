@@ -125,10 +125,24 @@ class Model_Admin extends Model_Abstract {
     {
         $adminId = !empty($param['admin_id']) ? $param['admin_id'] : '';
         $admin = self::find($adminId);
+        $url = !empty($param['url']) ? \Lib\Str::convertURL($param['url']) : '';
         $time = time();
         if (empty($admin)) {
             self::errorNotExist('admin_id', $adminId);
             return false;
+        }
+        
+        if (!empty($url)) {
+            $check = self::find('first', array(
+                'where' => array(
+                    'url' => $url,
+                    array('id', '!=', $adminId)
+                )
+            ));
+            if (!empty($check)) {
+                self::errorDuplicate('Tên cửa hàng');
+                return false;
+            }
         }
         
         // Upload image
@@ -164,7 +178,7 @@ class Model_Admin extends Model_Abstract {
             $admin->set('description', $param['description']);
         }
         if (!empty($param['url'])) {
-            $admin->set('url', $param['url']);
+            $admin->set('url', $url);
         }
         $admin->set('updated', $time);
         
