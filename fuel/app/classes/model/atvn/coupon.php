@@ -28,7 +28,8 @@ class Model_Atvn_Coupon extends Model_Abstract {
         'name',
         'start_time',
         'disable',
-        'created'
+        'created',
+        'is_hot'
     );
 
     protected static $_observers = array(
@@ -175,6 +176,8 @@ class Model_Atvn_Coupon extends Model_Abstract {
         // Filter
         if (!empty($param['from_front'])) {
             $query->where(self::$_table_name . '.disable', 0);
+            $query->where(self::$_table_name . '.end_time', '>', time());
+            $query->where(self::$_table_name . '.start_time', '<=', time());
         }
         
         // Pagination
@@ -196,7 +199,8 @@ class Model_Atvn_Coupon extends Model_Abstract {
             }
             $query->order_by($sortExplode[0], $sortExplode[1]);
         } else {
-            $query->order_by(self::$_table_name . '.created', 'DESC');
+            $query->order_by(self::$_table_name . '.is_hot', 'DESC');
+            $query->order_by(self::$_table_name . '.end_time', 'ASC');
         }
         
         // Get data
@@ -227,6 +231,8 @@ class Model_Atvn_Coupon extends Model_Abstract {
         // Filter
         if (!empty($param['from_front'])) {
             $query->where(self::$_table_name . '.disable', 0);
+            $query->where(self::$_table_name . '.end_time', '>', time());
+            $query->where(self::$_table_name . '.start_time', '<=', time());
         }
         
         // Pagination
@@ -248,7 +254,8 @@ class Model_Atvn_Coupon extends Model_Abstract {
             }
             $query->order_by($sortExplode[0], $sortExplode[1]);
         } else {
-            $query->order_by(self::$_table_name . '.created', 'DESC');
+            $query->order_by(self::$_table_name . '.is_hot', 'DESC');
+            $query->order_by(self::$_table_name . '.end_time', 'ASC');
         }
         
         // Get data
