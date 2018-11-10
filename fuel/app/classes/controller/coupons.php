@@ -48,4 +48,11 @@ class Controller_Coupons extends \Controller_App {
     public function action_all() {
         return \Bus\Coupons_All::getInstance()->execute();
     }
+    
+    /**
+     * Coupon all
+     */
+    public function action_getdetailforfront() {
+        return \Bus\Coupons_GetDetailForFront::getInstance()->execute();
+    }
 }

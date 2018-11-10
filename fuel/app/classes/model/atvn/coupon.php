@@ -180,6 +180,10 @@ class Model_Atvn_Coupon extends Model_Abstract {
             $query->where(self::$_table_name . '.start_time', '<=', time());
         }
         
+        if (!empty($param['merchant'])) {
+            $query->where(self::$_table_name . '.merchant', 'LIKE', "%{$param['merchant']}%");
+        }
+        
         // Pagination
         if (!empty($param['page']) && $param['limit']) {
             $offset = ($param['page'] - 1) * $param['limit'];
@@ -234,6 +238,9 @@ class Model_Atvn_Coupon extends Model_Abstract {
             $query->where(self::$_table_name . '.end_time', '>', time());
             $query->where(self::$_table_name . '.start_time', '<=', time());
         }
+        if (!empty($param['merchant'])) {
+            $query->where(self::$_table_name . '.merchant', 'LIKE', "%{$param['merchant']}%");
+        }
         
         // Pagination
         if (!empty($param['page']) && $param['limit']) {
@@ -260,6 +267,34 @@ class Model_Atvn_Coupon extends Model_Abstract {
         
         // Get data
         $data = $query->execute()->as_array();
+        
+        return $data;
+    }
+    
+    /**
+     * Get detail
+     *
+     * @author AnhMH
+     * @param array $param Input data
+     * @return array
+     */
+    public static function get_detail_for_front($param)
+    {
+        $data = array();
+        $query = DB::select(
+                self::$_table_name.'.*'
+            )
+            ->from(self::$_table_name)
+            ->where(self::$_table_name.'.id', $param['id'])
+        ;
+        $data['coupon'] = $query->execute()->offsetGet(0);
+        
+        $data['relate_coupons'] = self::get_all(array(
+            'limit' => 8,
+            'page' => 1,
+            'not_id' => !empty($data['coupon']['id']) ? $data['coupon']['id'] : '',
+            'merchant' => !empty($data['coupon']['merchant']) ? $data['coupon']['merchant'] : ''
+        ));
         
         return $data;
     }

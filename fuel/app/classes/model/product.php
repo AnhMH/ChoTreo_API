@@ -116,7 +116,15 @@ class Model_Product extends Model_Abstract {
             }
             $query->order_by($sortExplode[0], $sortExplode[1]);
         } else {
-            $query->order_by(self::$_table_name . '.id', 'DESC');
+            if (!empty($param['from_front'])) {
+                $query->order_by(self::$_table_name . '.is_hot', 'DESC');
+                $query->order_by(self::$_table_name . '.is_feature', 'DESC');
+                $query->order_by(self::$_table_name . '.is_new', 'DESC');
+                $query->order_by(self::$_table_name . '.id', 'ASC');
+            } else {
+                $query->order_by(self::$_table_name . '.id', 'DESC');
+            }
+            
         }
         
         // Get data
@@ -403,6 +411,14 @@ class Model_Product extends Model_Abstract {
             $query->where(self::$_table_name.'.id', 'IN', $param['ids']);
         }
         
+        if (!empty($param['not_id'])) {
+            $query->where(self::$_table_name.'.id', '!=', $param['not_id']);
+        }
+        
+        if (!empty($param['cate_id'])) {
+            $query->where(self::$_table_name . '.cate_id', $param['cate_id']);
+        }
+        
         if (!empty($param['admin_id'])) {
             $query->where(self::$_table_name . '.admin_id', $param['admin_id']);
         }
@@ -429,7 +445,10 @@ class Model_Product extends Model_Abstract {
             }
             $query->order_by($sortExplode[0], $sortExplode[1]);
         } else {
-            $query->order_by(self::$_table_name . '.id', 'DESC');
+            $query->order_by(self::$_table_name . '.is_hot', 'DESC');
+            $query->order_by(self::$_table_name . '.is_feature', 'DESC');
+            $query->order_by(self::$_table_name . '.is_new', 'DESC');
+            $query->order_by(self::$_table_name . '.id', 'ASC');
         }
         
         // Get data
@@ -539,7 +558,12 @@ class Model_Product extends Model_Abstract {
         ;
         $data['product'] = $query->execute()->offsetGet(0);
         
-        $data['relate_products'] = self::get_all(array());
+        $data['relate_products'] = self::get_all(array(
+            'limit' => 8,
+            'page' => 1,
+            'not_id' => !empty($data['product']['id']) ? $data['product']['id'] : '',
+            'cate_id' => !empty($data['product']['cate_id']) ? $data['product']['cate_id'] : ''
+        ));
         
         return $data;
     }
