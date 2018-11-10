@@ -153,6 +153,11 @@ class Model_Setting extends Model_Abstract {
         
         // Get categories
         $data['cates'] = Model_Cate::get_all(array('get_root' => 1));
+        $data['atvn_top_products'] = Model_Atvn_Product::get_all(array(
+            'from_front' => 1,
+            'limit' => 16,
+            'page' => 1
+        ));
         
         return $data;
     }

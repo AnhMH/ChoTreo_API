@@ -15,7 +15,9 @@ namespace Lib;
 class AccessTrade {
     
     public static $_url_get_offer = 'https://api.accesstrade.vn/v1/offers_informations';
-    
+    public static $_url_get_top_product = 'https://api.accesstrade.vn/v1/top_products';
+
+
     /**
     * Call api request 
     *
@@ -103,6 +105,25 @@ class AccessTrade {
             'status' => 1,//Truyền value 1 để lấy thông tin các offers còn hoạt động, value 0 để lấy thông tin các offers hết hạn, và không truyền key này để lấy tất cả.
         );
         $url = self::$_url_get_offer;
+        $data = self::call($url, $param);
+        return $data;
+    }
+    
+    /**
+    * Call api request 
+    *
+    * @author AnhMH
+    * @param string $url Request url.
+    * @param array $param Input data.
+    * @param string $method Method GET|POST
+    * @return array|bool Response data or false if error
+    */
+    public static function getTopProducts() {
+        $param = array(
+            'date_from' => date('d-m-Y', time() - 30*3600),
+            'date_to' => date('d-m-Y', time()),
+        );
+        $url = self::$_url_get_top_product;
         $data = self::call($url, $param);
         return $data;
     }
