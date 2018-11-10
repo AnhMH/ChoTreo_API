@@ -342,6 +342,7 @@ return array(
         'settings/gethomedata',
         'products/getdetailforfront',
         'cates/getdetailforfront',
+        'coupons/getdetailforfront',
         'products/list',
         'contact/addupdate',
         'customers/login',
