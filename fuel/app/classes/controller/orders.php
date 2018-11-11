@@ -41,4 +41,11 @@ class Controller_Orders extends \Controller_App {
     public function action_disable() {
         return \Bus\Orders_Disable::getInstance()->execute();
     }
+    
+    /**
+     * Order change status
+     */
+    public function action_changestatus() {
+        return \Bus\Orders_ChangeStatus::getInstance()->execute();
+    }
 }

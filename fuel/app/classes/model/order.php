@@ -572,4 +572,28 @@ class Model_Order extends Model_Abstract {
         return false;
     }
     
+    /**
+     * Change status
+     *
+     * @author AnhMH
+     * @param array $param Input data
+     * @return Int|bool
+     */
+    public static function change_status($param) {
+        $orderId = !empty($param['order_id']) ? $param['order_id'] : 0;
+        $status = !empty($param['status']) ? $param['status'] : 0;
+        $self = self::find($orderId);
+        if (empty($self)) {
+            self::errorNotExist('order_id');
+            return false;
+        }
+        $self->set('status', $status);
+        if ($self->save()) {
+            if (empty($self->id)) {
+                $self->id = self::cached_object($self)->_original['id'];
+            }
+            return $self->id;
+        }
+        return false;
+    }
 }
