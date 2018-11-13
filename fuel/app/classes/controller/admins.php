@@ -15,6 +15,13 @@ class Controller_Admins extends \Controller_App {
     }
     
     /**
+     * Admin list
+     */
+    public function action_list() {
+        return \Bus\Admins_List::getInstance()->execute();
+    }
+    
+    /**
      * Admin update profile
      */
     public function action_updateprofile() {
@@ -33,5 +40,26 @@ class Controller_Admins extends \Controller_App {
      */
     public function action_getdetailforfront() {
         return \Bus\Admins_GetDetailForFront::getInstance()->execute();
+    }
+    
+    /**
+     * Admin disable
+     */
+    public function action_disable() {
+        return \Bus\Admins_Disable::getInstance()->execute();
+    }
+    
+    /**
+     * Admin delete
+     */
+    public function action_delete() {
+        return \Bus\Admins_Delete::getInstance()->execute();
+    }
+    
+    /**
+     * Admin confirm
+     */
+    public function action_confirm() {
+        return \Bus\Admins_Confirm::getInstance()->execute();
     }
 }

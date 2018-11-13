@@ -29,7 +29,9 @@ class Model_Admin extends Model_Abstract {
         'created',
         'updated',
         'disable',
-        'url'
+        'url',
+        'is_confirm',
+        'point'
     );
 
     protected static $_observers = array(
@@ -256,6 +258,8 @@ class Model_Admin extends Model_Abstract {
         // Filter
         $query->where(self::$_table_name.'.url', 'IS NOT', NULL);
         $query->where(self::$_table_name.'.url', '!=', '');
+        $query->where(self::$_table_name.'.disable', 0);
+        $query->where(self::$_table_name.'.is_confirm', 1);
 
         // Pagination
         if (!empty($param['page']) && $param['limit']) {
@@ -300,7 +304,9 @@ class Model_Admin extends Model_Abstract {
         // Get admin data
         $admin = self::find('first', array(
             'where' => array(
-                'url' => $param['url']
+                'url' => $param['url'],
+                'disable' => 0,
+                'is_confirm' => 1
             )
         ));
         
@@ -311,5 +317,123 @@ class Model_Admin extends Model_Abstract {
         }
         
         return $data;
+    }
+    
+    /**
+     * List
+     *
+     * @author AnhMH
+     * @param array $param Input data
+     * @return array|bool Detail Slider or false if error
+     */
+    public static function get_list($param)
+    {
+        // Query
+        $query = DB::select(
+                self::$_table_name.'.*'
+            )
+            ->from(self::$_table_name)
+        ;
+        
+        // Filter
+        if (!empty($param['name'])) {
+            $query->where(self::$_table_name.'.name', 'LIKE', "%{$param['name']}%");
+        }
+        if (!empty($param['email'])) {
+            $query->where(self::$_table_name.'.email', 'LIKE', "%{$param['email']}%");
+        }
+        if (isset($param['is_confirm']) && $param['is_confirm'] != '') {
+            $query->where(self::$_table_name.'.is_confirm', $param['is_confirm']);
+        }
+        
+        // Pagination
+        if (!empty($param['page']) && $param['limit']) {
+            $offset = ($param['page'] - 1) * $param['limit'];
+            $query->limit($param['limit'])->offset($offset);
+        }
+        
+        // Sort
+        if (!empty($param['sort'])) {
+            if (!self::checkSort($param['sort'])) {
+                self::errorParamInvalid('sort');
+                return false;
+            }
+
+            $sortExplode = explode('-', $param['sort']);
+            if ($sortExplode[0] == 'created') {
+                $sortExplode[0] = self::$_table_name . '.created';
+            }
+            $query->order_by($sortExplode[0], $sortExplode[1]);
+        } else {
+            $query->order_by(self::$_table_name . '.id', 'DESC');
+        }
+        
+        // Get data
+        $data = $query->execute()->as_array();
+        $total = !empty($data) ? DB::count_last_query(self::$slave_db) : 0;
+        
+        return array(
+            'total' => $total,
+            'data' => $data
+        );
+    }
+    
+     /**
+     * Delete
+     *
+     * @author AnhMH
+     * @param array $param Input data
+     * @return Int|bool
+     */
+    public static function del($param)
+    {
+        $table = self::$_table_name;
+        $cond = '';
+        if (!empty($param['id'])) {
+            $cond .= "id IN ({$param['id']})";
+        }
+        
+        $sql = "DELETE FROM {$table} WHERE {$cond}";
+        return DB::query($sql)->execute();
+    }
+    
+    /**
+     * Disable
+     *
+     * @author AnhMH
+     * @param array $param Input data
+     * @return Int|bool
+     */
+    public static function disable($param)
+    {
+        $table = self::$_table_name;
+        $cond = '';
+        $disable = !empty($param['disable']) ? 1 : 0;
+        if (!empty($param['id'])) {
+            $cond .= "id IN ({$param['id']})";
+        }
+        
+        $sql = "UPDATE {$table} SET disable = {$disable} WHERE {$cond}";
+        return DB::query($sql)->execute();
+    }
+    
+    /**
+     * Confirm
+     *
+     * @author AnhMH
+     * @param array $param Input data
+     * @return Int|bool
+     */
+    public static function confirm($param)
+    {
+        $table = self::$_table_name;
+        $cond = '';
+        $disable = !empty($param['is_confirm']) ? 1 : 0;
+        if (!empty($param['id'])) {
+            $cond .= "id IN ({$param['id']})";
+        }
+        
+        $sql = "UPDATE {$table} SET is_confirm = {$disable} WHERE {$cond}";
+        return DB::query($sql)->execute();
     }
 }

@@ -188,14 +188,14 @@ class Model_Slider extends Model_Abstract {
      */
     public static function del($param)
     {
-        $delete = self::deleteRow(self::$_table_name, array(
-            'id' => $param['id']
-        ));
-        if ($delete) {
-            return $param['id'];
-        } else {
-            return 0;
+        $table = self::$_table_name;
+        $cond = '';
+        if (!empty($param['id'])) {
+            $cond .= "id IN ({$param['id']})";
         }
+        
+        $sql = "DELETE FROM {$table} WHERE {$cond}";
+        return DB::query($sql)->execute();
     }
     
     /**
