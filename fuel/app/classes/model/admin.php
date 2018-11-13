@@ -183,6 +183,7 @@ class Model_Admin extends Model_Abstract {
             $admin->set('url', $url);
         }
         $admin->set('updated', $time);
+        $admin->set('is_confirm', 0);
         
         // Save data
         if ($admin->save()) {

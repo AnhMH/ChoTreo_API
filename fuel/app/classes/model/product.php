@@ -81,11 +81,26 @@ class Model_Product extends Model_Abstract {
             $query->or_where(self::$_table_name.'.code', 'LIKE', "%{$param['keyword']}%");
             $query->where_close();
         }
-        if (isset($param['disable']) && $param['disable'] != '') {
-            $query->where(self::$_table_name.'.disable', $param['disable']);
+        if (empty($param['master_list'])) {
+            if (isset($param['disable']) && $param['disable'] != '') {
+                $query->where(self::$_table_name.'.disable', $param['disable']);
+            } else {
+                $query->where(self::$_table_name.'.disable', 0);
+            }
         } else {
-            $query->where(self::$_table_name.'.disable', 0);
+            $query->select(
+                    array('admins.url', 'admin_url'),
+                    'admins.email',
+                    array('admins.name', 'admin_name')
+            );
+            $query->join('admins', 'LEFT')
+                    ->on('admins.id', '=', self::$_table_name.'.admin_id');
+            
+            if (isset($param['disable']) && $param['disable'] != '') {
+                $query->where(self::$_table_name.'.disable', $param['disable']);
+            }
         }
+        
         if (!empty($param['cate_id'])) {
             $cateIds = explode(',', $param['cate_id']);
             $query->where(self::$_table_name.'.cate_id', 'IN', $cateIds);
@@ -331,20 +346,15 @@ class Model_Product extends Model_Abstract {
      */
     public static function disable($param)
     {
+        $table = self::$_table_name;
+        $cond = '';
         $disable = !empty($param['disable']) ? 1 : 0;
-        $self = self::find($param['id']);
-        if (empty($self)) {
-            self::errorNotExist('product_id');
-            return false;
+        if (!empty($param['id'])) {
+            $cond .= "id IN ({$param['id']})";
         }
-        $self->set('disable', $disable);
-        if ($self->save()) {
-            if (empty($self->id)) {
-                $self->id = self::cached_object($self)->_original['id'];
-            }
-            return $self->id;
-        }
-        return false;
+        
+        $sql = "UPDATE {$table} SET disable = {$disable} WHERE {$cond}";
+        return DB::query($sql)->execute();
     }
     
     /**
@@ -425,6 +435,7 @@ class Model_Product extends Model_Abstract {
         
         $query->where(self::$_table_name.'.disable', 0);
         $query->where(self::$_table_name.'.is_display_web', 1);
+        $query->where(self::$_table_name.'.is_confirm', 1);
         
         // Pagination
         if (!empty($param['page']) && $param['limit']) {
@@ -555,6 +566,9 @@ class Model_Product extends Model_Abstract {
             ->join('admins', 'LEFT')
             ->on('admins.id', '=', self::$_table_name.'.admin_id')
             ->where(self::$_table_name.'.url', $param['url'])
+            ->where(self::$_table_name.'.disable', 0)
+            ->where(self::$_table_name.'.is_display_web', 1)
+            ->where(self::$_table_name.'.is_confirm', 1)
         ;
         $data['product'] = $query->execute()->offsetGet(0);
         
@@ -566,5 +580,25 @@ class Model_Product extends Model_Abstract {
         ));
         
         return $data;
+    }
+    
+    /**
+     * Confirm
+     *
+     * @author AnhMH
+     * @param array $param Input data
+     * @return Int|bool
+     */
+    public static function confirm($param)
+    {
+        $table = self::$_table_name;
+        $cond = '';
+        $disable = !empty($param['is_confirm']) ? 1 : 0;
+        if (!empty($param['id'])) {
+            $cond .= "id IN ({$param['id']})";
+        }
+        
+        $sql = "UPDATE {$table} SET is_confirm = {$disable} WHERE {$cond}";
+        return DB::query($sql)->execute();
     }
 }
