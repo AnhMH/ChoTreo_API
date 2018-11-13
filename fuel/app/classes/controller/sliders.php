@@ -34,4 +34,11 @@ class Controller_Sliders extends \Controller_App {
     public function action_delete() {
         return \Bus\Sliders_Delete::getInstance()->execute();
     }
+    
+    /**
+     * Slider delete
+     */
+    public function action_disable() {
+        return \Bus\Sliders_Disable::getInstance()->execute();
+    }
 }

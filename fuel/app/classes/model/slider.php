@@ -143,6 +143,9 @@ class Model_Slider extends Model_Abstract {
         if (!empty($param['stt'])) {
             $self->set('stt', $param['stt']);
         }
+        if (isset($param['disable'])) {
+            $self->set('disable', $param['disable']);
+        }
         if ($new) {
             $self->set('created', $time);
             $self->set('updated', $time);
@@ -209,11 +212,32 @@ class Model_Slider extends Model_Abstract {
                 self::$_table_name.'.*'
             )
             ->from(self::$_table_name)
+            ->where(self::$_table_name.'.disable', 0)
         ;
         
         // Get data
         $data = $query->execute()->as_array();
         
         return $data;
+    }
+    
+    /**
+     * Disable
+     *
+     * @author AnhMH
+     * @param array $param Input data
+     * @return Int|bool
+     */
+    public static function disable($param)
+    {
+        $table = self::$_table_name;
+        $cond = '';
+        $disable = !empty($param['disable']) ? 1 : 0;
+        if (!empty($param['id'])) {
+            $cond .= "id IN ({$param['id']})";
+        }
+        
+        $sql = "UPDATE {$table} SET disable = {$disable} WHERE {$cond}";
+        return DB::query($sql)->execute();
     }
 }
