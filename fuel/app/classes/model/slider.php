@@ -61,9 +61,6 @@ class Model_Slider extends Model_Abstract {
             $offset = ($param['page'] - 1) * $param['limit'];
             $query->limit($param['limit'])->offset($offset);
         }
-        if (!empty($param['admin_id'])) {
-            $query->where(self::$_table_name . '.admin_id', $param['admin_id']);
-        }
         
         // Sort
         if (!empty($param['sort'])) {
