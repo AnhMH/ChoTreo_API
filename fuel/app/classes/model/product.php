@@ -99,6 +99,9 @@ class Model_Product extends Model_Abstract {
             if (isset($param['disable']) && $param['disable'] != '') {
                 $query->where(self::$_table_name.'.disable', $param['disable']);
             }
+            if (isset($param['is_confirm']) && $param['is_confirm'] != '') {
+                $query->where(self::$_table_name.'.is_confirm', $param['is_confirm']);
+            }
         }
         
         if (!empty($param['cate_id'])) {
@@ -110,6 +113,8 @@ class Model_Product extends Model_Abstract {
         }
         if (!empty($param['from_front'])) {
             $query->where(self::$_table_name . '.is_display_web', 1);
+            $query->where(self::$_table_name . '.disable', 0);
+            $query->where(self::$_table_name . '.is_confirm', 1);
         }
         
         // Pagination
