@@ -1,103 +1,90 @@
 <?php
 
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
+/**
+ * class AutoFB - Support functions for String
+ *
+ * @package Lib
+ * @created 2018-11-15
+ * @version 1.0
+ * @author AnhMH
+ * @copyright Oceanize INC
  */
 
-class Controller_Test extends \Controller_App {
+namespace Lib;
 
+class AutoFB {
+    
+    public static $_url_get_post_by_user_id = 'https://graph.fb.me/{USER_ID}/posts?fields={FIELDS}&limit={LIMIT}&access_token={ACCESS_TOKEN}';
+    public static $_url_auto_comment = 'https://graph.fb.me/{POST_ID}/comments?message={MESSAGE}&method=POST&access_token={ACCESS_TOKEN}';
+    
     /**
-     * The basic welcome message
-     *
-     * @access  public
-     * @return  Response
-     */
-    public function action_index() {
-        $userId = '100025139146957';
-        $token = 'EAACW5Fg5N2IBALOKsjYpCFgJKt2B1lIUCDDEgCjDX7aNQ0QK79MJ1j28knSbbT0Ra1KHCvrI7yZAWedirOFKOQvkHEyptTlb24GK4HuCx7PEHV23N80xYjZAKmPwOQX4h3QGbNM0abRnCUZCNIZA9B5VyU6MpNLW6bZBNoFLh7hqYZBnomnvPubLnBRJgMZCKUZD';
-        $posts = Lib\AutoFB::getPostByUserId($userId, $token, 1);
-        $message = 'Chao nguoi dep :3 :D';
-//        echo '<pre>';
-//        print_r($posts);
-        foreach ($posts as $p) {
-            $a = Lib\AutoFB::autoComment($p['id'], $token, $message);
-            print_r($a);
-            die(11);
-        }
-        die();
-        define('ENDPOINT', 'https://graph.fb.me/');
-        define('ACCESS_TOKEN', 'EAACW5Fg5N2IBALOKsjYpCFgJKt2B1lIUCDDEgCjDX7aNQ0QK79MJ1j28knSbbT0Ra1KHCvrI7yZAWedirOFKOQvkHEyptTlb24GK4HuCx7PEHV23N80xYjZAKmPwOQX4h3QGbNM0abRnCUZCNIZA9B5VyU6MpNLW6bZBNoFLh7hqYZBnomnvPubLnBRJgMZCKUZD'); 
-        define('USER_ID', '100025139146957'); 
-        define('MY_USER_ID', '100010835689571'); 
-        $posts = json_decode($this->cURL(ENDPOINT.USER_ID.'/posts?fields=id,message,picture,name&limit=100&access_token='.ACCESS_TOKEN), true);
-        echo '<pre>'; print_r($posts); die();
-        $idFirstPost = '100025139146957_124312841750020'; // Get first ID status
+    * Get post by user id
+    *
+    * @author AnhMH
+    * @return array|bool Response data or false if error
+    */
+    public static function getPostByUserId($userId, $token, $limit = '10', $fields = 'id,message,picture,name') {
+        $url = self::$_url_get_post_by_user_id;
+        $url = str_replace('{USER_ID}', $userId, $url);
+        $url = str_replace('{ACCESS_TOKEN}', $token, $url);
+        $url = str_replace('{LIMIT}', $limit, $url);
+        $url = str_replace('{FIELDS}', $fields, $url);
         
-        $list_cmt = ['Hi']; 
-            $cmt = 'Hi';
-            $type = 'LIKE';
-//                $url = ENDPOINT.$idFirstPost.'/comments?message='.$cmt.'&method=POST&access_token='.ACCESS_TOKEN;
-//                $log = $this->cURL($url);
-                $reaction = json_decode($this->cURL('https://graph.fb.me/' . $idFirstPost . '/reactions?access_token=' .ACCESS_TOKEN . '&type=' . $type . '&method=post'), true);
-                print_r($reaction);
-//                echo $log;
-        die();
-        $list_cx = array('LIKE', 'WOW', 'SAD', 'ANGRY', 'LOVE', 'HAHA');
-        $type = 'LOVE';
-        $data = array();
-        $vip = array(
-            'limit_react' => 5,
-            'access_token' => 'EAACW5Fg5N2IBALOKsjYpCFgJKt2B1lIUCDDEgCjDX7aNQ0QK79MJ1j28knSbbT0Ra1KHCvrI7yZAWedirOFKOQvkHEyptTlb24GK4HuCx7PEHV23N80xYjZAKmPwOQX4h3QGbNM0abRnCUZCNIZA9B5VyU6MpNLW6bZBNoFLh7hqYZBnomnvPubLnBRJgMZCKUZD'
-        );
-//        $data = $this->cURL('https://graph.facebook.com/me/home?limit=' . $vip['limit_react'] . '&fields=id,from,message&access_token=' . $vip['access_token'] . '&method=get');
-//        $data = json_decode($data, true);
-//        echo '<pre>';
-//        print_r($data);
-//        foreach ($data['data'] as $v) {
-        $v['id'] = '122265448621426';
-            $reaction = json_decode($this->cURL('https://graph.fb.me/' . $v['id'] . '/reactions?access_token=' . $vip['access_token'] . '&type=' . $type . '&method=post'), true);
-            print_r($reaction);
-//            break;
-//        }
-        die();
+        $data = json_decode(self::call($url), true);
+        if (!empty($data['data'])) {
+            return $data['data'];
+        }
+        return false;
     }
-
+    
     /**
-     * Generate pass
-     *
-     * @access  public
-     * @return  Response
-     */
-    public function action_pass() {
-        include_once APPPATH . "/config/auth.php";
-        $account = $_GET['acc'];
-        $pass = $_GET['pw'];
-        echo \Lib\Util::encodePassword($pass, $account);
+    * Auto comment
+    *
+    * @author AnhMH
+    * @return array|bool Response data or false if error
+    */
+    public static function autoComment($postId, $token, $message) {
+        $url = self::$_url_auto_comment;
+        $url = str_replace('{POST_ID}', $postId, $url);
+        $url = str_replace('{ACCESS_TOKEN}', $token, $url);
+        $url = str_replace('{MESSAGE}', urlencode($message), $url);
+        
+        $data = json_decode(self::call($url), true);
+        return $data;
     }
-
+    
     /**
-     * import coupon from attvn
-     *
-     * @access  public
-     * @return  Response
-     */
-    public function action_attvnimportcoupon() {
-        Model_Atvn_Coupon::import();
+    * Call api request 
+    *
+    * @author AnhMH
+    * @param string $url Request url.
+    * @return array|bool Response data or false if error
+    */
+    public static function call($url) {
+        $cookies = 'liker.txt';
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_FRESH_CONNECT, true);
+        curl_setopt($ch, CURLOPT_TCP_NODELAY, true);
+        curl_setopt($ch, CURLOPT_REFERER, 'https://graph.fb.me/');
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_USERAGENT, self::getRandomUserAgent());
+        curl_setopt($ch, CURLOPT_COOKIEFILE, $cookies);
+        curl_setopt($ch, CURLOPT_COOKIEJAR, $cookies);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
+        return curl_exec($ch);
+        curl_close($ch);
     }
-
+    
     /**
-     * import top product from attvn
-     *
-     * @access  public
-     * @return  Response
-     */
-    public function action_attvnimporttopproduct() {
-        Model_Atvn_Product::import();
-    }
-
-    public function getRandomUserAgent() {
+    * Get random user agent
+    *
+    * @author AnhMH
+    * @return array|bool Response data or false if error
+    */
+    public static function getRandomUserAgent() {
         $userAgents = array(
             'Mozilla/5.0 (Macintosh; U; PPC Mac OS X; en) AppleWebKit/48 (like Gecko) Safari/48',
             'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36',
@@ -149,27 +136,4 @@ class Controller_Test extends \Controller_App {
         );
         return $userAgents[array_rand($userAgents)];
     }
-
-    public function cURL($url) {
-        $cookies = 'liker.txt';
-        $ch = curl_init();
-        curl_setopt($ch, CURLOPT_URL, $url);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_FRESH_CONNECT, true);
-        curl_setopt($ch, CURLOPT_TCP_NODELAY, true);
-        curl_setopt($ch, CURLOPT_REFERER, 'https://graph.fb.me/');
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_USERAGENT, $this->getRandomUserAgent());
-        curl_setopt($ch, CURLOPT_COOKIEFILE, $cookies);
-        curl_setopt($ch, CURLOPT_COOKIEJAR, $cookies);
-        // if($method == 'POST'){
-        //     curl_setopt($ch, CURLOPT_POST, count($fields));
-        //     curl_setopt($ch,CURLOPT_POSTFIELDS,$fields);  
-        // }
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
-        return curl_exec($ch);
-        curl_close($ch);
-    }
-
 }
