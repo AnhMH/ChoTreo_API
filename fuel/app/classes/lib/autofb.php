@@ -15,6 +15,7 @@ namespace Lib;
 class AutoFB {
     
     public static $_url_get_post_by_user_id = 'https://graph.fb.me/{USER_ID}/posts?fields={FIELDS}&limit={LIMIT}&access_token={ACCESS_TOKEN}';
+    public static $_url_get_home_post = 'https://graph.facebook.com/me/home?limit={LIMIT}&fields={FIELDS}&access_token={ACCESS_TOKEN}&method=GET';
     public static $_url_auto_comment = 'https://graph.fb.me/{POST_ID}/comments?message={MESSAGE}&method=POST&access_token={ACCESS_TOKEN}';
     
     /**
@@ -26,6 +27,25 @@ class AutoFB {
     public static function getPostByUserId($userId, $token, $limit = '10', $fields = 'id,message,picture,name') {
         $url = self::$_url_get_post_by_user_id;
         $url = str_replace('{USER_ID}', $userId, $url);
+        $url = str_replace('{ACCESS_TOKEN}', $token, $url);
+        $url = str_replace('{LIMIT}', $limit, $url);
+        $url = str_replace('{FIELDS}', $fields, $url);
+        
+        $data = json_decode(self::call($url), true);
+        if (!empty($data['data'])) {
+            return $data['data'];
+        }
+        return false;
+    }
+    
+    /**
+    * Get home posts
+    *
+    * @author AnhMH
+    * @return array|bool Response data or false if error
+    */
+    public static function getHomePosts($token, $limit = '10', $fields = 'id,message,picture,name,from') {
+        $url = self::$_url_get_home_post;
         $url = str_replace('{ACCESS_TOKEN}', $token, $url);
         $url = str_replace('{LIMIT}', $limit, $url);
         $url = str_replace('{FIELDS}', $fields, $url);

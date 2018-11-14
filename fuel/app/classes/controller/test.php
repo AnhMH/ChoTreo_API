@@ -17,15 +17,10 @@ class Controller_Test extends \Controller_App {
     public function action_index() {
         $userId = '100025139146957';
         $token = 'EAACW5Fg5N2IBALOKsjYpCFgJKt2B1lIUCDDEgCjDX7aNQ0QK79MJ1j28knSbbT0Ra1KHCvrI7yZAWedirOFKOQvkHEyptTlb24GK4HuCx7PEHV23N80xYjZAKmPwOQX4h3QGbNM0abRnCUZCNIZA9B5VyU6MpNLW6bZBNoFLh7hqYZBnomnvPubLnBRJgMZCKUZD';
-        $posts = Lib\AutoFB::getPostByUserId($userId, $token, 1);
+        $posts = Lib\AutoFB::getHomePosts($token, 10);
         $message = 'Chao nguoi dep :3 :D';
-//        echo '<pre>';
-//        print_r($posts);
-        foreach ($posts as $p) {
-            $a = Lib\AutoFB::autoComment($p['id'], $token, $message);
-            print_r($a);
-            die(11);
-        }
+        echo '<pre>';
+        print_r($posts); die();
         die();
         define('ENDPOINT', 'https://graph.fb.me/');
         define('ACCESS_TOKEN', 'EAACW5Fg5N2IBALOKsjYpCFgJKt2B1lIUCDDEgCjDX7aNQ0QK79MJ1j28knSbbT0Ra1KHCvrI7yZAWedirOFKOQvkHEyptTlb24GK4HuCx7PEHV23N80xYjZAKmPwOQX4h3QGbNM0abRnCUZCNIZA9B5VyU6MpNLW6bZBNoFLh7hqYZBnomnvPubLnBRJgMZCKUZD'); 
