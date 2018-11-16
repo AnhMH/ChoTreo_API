@@ -210,18 +210,18 @@ class Model_Admin extends Model_Abstract {
         
         $check = self::find('first', array(
             'where' => array(
-                'email' => $param['register_email']
+                'email' => $param['email']
             )
         ));
         if (!empty($check)) {
-            self::errorDuplicate('email', "Email {$param['register_email']} đã được đăng ký.");
+            self::errorDuplicate('email', "Email {$param['email']} đã được đăng ký.");
             return false;
         }
         
         $self = new self;
-        $self->set('name', $param['register_name']);
-        $self->set('email', $param['register_email']);
-        $self->set('password', \Lib\Util::encodePassword($param['register_password'], $param['register_email']));
+        $self->set('name', $param['name']);
+        $self->set('email', $param['email']);
+        $self->set('password', \Lib\Util::encodePassword($param['password'], $param['email']));
         $self->set('type', 0);
         $self->set('account', '');
         $self->set('created', $time);
