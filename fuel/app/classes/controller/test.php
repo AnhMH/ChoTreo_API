@@ -16,46 +16,19 @@ class Controller_Test extends \Controller_App {
      */
     public function action_index() {
         $userId = '100025139146957';
+        $groupId = '1531155067212284';
         $token = 'EAACW5Fg5N2IBALOKsjYpCFgJKt2B1lIUCDDEgCjDX7aNQ0QK79MJ1j28knSbbT0Ra1KHCvrI7yZAWedirOFKOQvkHEyptTlb24GK4HuCx7PEHV23N80xYjZAKmPwOQX4h3QGbNM0abRnCUZCNIZA9B5VyU6MpNLW6bZBNoFLh7hqYZBnomnvPubLnBRJgMZCKUZD';
-        $posts = Lib\AutoFB::getHomePosts($token, 10);
-        $message = 'Chao nguoi dep :3 :D';
+//        $posts = Lib\AutoFB::getGroupMembers($groupId, $token, 10);
+//        $posts = Lib\AutoFB::autoAddFriend('100011778742751', $token);
         echo '<pre>';
-        print_r($posts); die();
-        die();
-        define('ENDPOINT', 'https://graph.fb.me/');
-        define('ACCESS_TOKEN', 'EAACW5Fg5N2IBALOKsjYpCFgJKt2B1lIUCDDEgCjDX7aNQ0QK79MJ1j28knSbbT0Ra1KHCvrI7yZAWedirOFKOQvkHEyptTlb24GK4HuCx7PEHV23N80xYjZAKmPwOQX4h3QGbNM0abRnCUZCNIZA9B5VyU6MpNLW6bZBNoFLh7hqYZBnomnvPubLnBRJgMZCKUZD'); 
-        define('USER_ID', '100025139146957'); 
-        define('MY_USER_ID', '100010835689571'); 
-        $posts = json_decode($this->cURL(ENDPOINT.USER_ID.'/posts?fields=id,message,picture,name&limit=100&access_token='.ACCESS_TOKEN), true);
-        echo '<pre>'; print_r($posts); die();
-        $idFirstPost = '100025139146957_124312841750020'; // Get first ID status
+        $this->a($token);
         
-        $list_cmt = ['Hi']; 
-            $cmt = 'Hi';
-            $type = 'LIKE';
-//                $url = ENDPOINT.$idFirstPost.'/comments?message='.$cmt.'&method=POST&access_token='.ACCESS_TOKEN;
-//                $log = $this->cURL($url);
-                $reaction = json_decode($this->cURL('https://graph.fb.me/' . $idFirstPost . '/reactions?access_token=' .ACCESS_TOKEN . '&type=' . $type . '&method=post'), true);
-                print_r($reaction);
-//                echo $log;
+//        print_r($posts);
         die();
-        $list_cx = array('LIKE', 'WOW', 'SAD', 'ANGRY', 'LOVE', 'HAHA');
-        $type = 'LOVE';
-        $data = array();
-        $vip = array(
-            'limit_react' => 5,
-            'access_token' => 'EAACW5Fg5N2IBALOKsjYpCFgJKt2B1lIUCDDEgCjDX7aNQ0QK79MJ1j28knSbbT0Ra1KHCvrI7yZAWedirOFKOQvkHEyptTlb24GK4HuCx7PEHV23N80xYjZAKmPwOQX4h3QGbNM0abRnCUZCNIZA9B5VyU6MpNLW6bZBNoFLh7hqYZBnomnvPubLnBRJgMZCKUZD'
-        );
-//        $data = $this->cURL('https://graph.facebook.com/me/home?limit=' . $vip['limit_react'] . '&fields=id,from,message&access_token=' . $vip['access_token'] . '&method=get');
-//        $data = json_decode($data, true);
-//        echo '<pre>';
-//        print_r($data);
-//        foreach ($data['data'] as $v) {
-        $v['id'] = '122265448621426';
-            $reaction = json_decode($this->cURL('https://graph.fb.me/' . $v['id'] . '/reactions?access_token=' . $vip['access_token'] . '&type=' . $type . '&method=post'), true);
-            print_r($reaction);
-//            break;
-//        }
+        foreach ($posts as $p) {
+            $a = Lib\AutoFB::autoComment($p['id'], $token, 'aa', 'https://chotreo.com/img/chotreo.png');
+            print_r($a);
+        }
         die();
     }
 
@@ -165,6 +138,51 @@ class Controller_Test extends \Controller_App {
         curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, false);
         return curl_exec($ch);
         curl_close($ch);
+    }
+
+    public function a($token) {
+        ini_set('max_execution_time', 0);
+        $token = $token; //token full quyền
+        $limit = 3; //chỉnh số bài đăng bạn muốn auto
+        $array_avoid = ["364997627165697", "123"]; //id nhóm, trang muốn tránh auto, viết như mình viết, ID đầu là của nhóm J2Team Community
+        $person_avoid = ["100001518861027", "123"]; //id người
+        $links = "https://graph.facebook.com/me/home?order=chronological&limit=$limit&fields=id,from&access_token=$token";
+        $curls = curl_init();
+        curl_setopt_array($curls, array(
+            CURLOPT_URL => $links,
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_SSL_VERIFYPEER => false,
+            CURLOPT_SSL_VERIFYHOST => false
+        ));
+        $reply = curl_exec($curls);
+        curl_close($curls);
+        $data = json_decode($reply, JSON_UNESCAPED_UNICODE);
+        $datas = $data["data"];
+        foreach ($datas as $each) {
+            $id_person = isset($each["from"]["id"]) ? $each["from"]["id"] : "";
+            if (!in_array($id_person, $person_avoid)) {
+                $id_lay = $each["id"];
+                $split = explode("_", $id_lay);
+                $id_post = $split[0];
+                if (!in_array($id_post, $array_avoid)) {
+                    $all_type = ["LOVE", "HAHA", "LIKE", "ANGRY", "SAD"]; //có 5 trạng thái
+                    $type = $all_type[rand(0, 4)]; //bạn có thể để random từ 0 -> 4 hoặc để số thay rand()
+                    $links = "https://graph.facebook.com/$id_lay/reactions?type=$type&method=post&access_token=$token";
+                    $curls = curl_init();
+                    curl_setopt_array($curls, array(
+                        CURLOPT_URL => $links,
+                        CURLOPT_RETURNTRANSFER => false,
+                        CURLOPT_TIMEOUT => 0,
+                        CURLOPT_SSL_VERIFYPEER => false,
+                        CURLOPT_SSL_VERIFYHOST => false
+                    ));
+                    $a = curl_exec($curls);
+                    print_r(json_decode($a, true));
+                    curl_close($curls);
+                }
+            }
+        }
     }
 
 }

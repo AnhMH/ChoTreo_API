@@ -16,7 +16,11 @@ class AutoFB {
     
     public static $_url_get_post_by_user_id = 'https://graph.fb.me/{USER_ID}/posts?fields={FIELDS}&limit={LIMIT}&access_token={ACCESS_TOKEN}';
     public static $_url_get_home_post = 'https://graph.facebook.com/me/home?limit={LIMIT}&fields={FIELDS}&access_token={ACCESS_TOKEN}&method=GET';
-    public static $_url_auto_comment = 'https://graph.fb.me/{POST_ID}/comments?message={MESSAGE}&method=POST&access_token={ACCESS_TOKEN}';
+    public static $_url_auto_comment = 'https://graph.fb.me/{POST_ID}/comments?message={MESSAGE}&attachment_url={AU}&method=POST&access_token={ACCESS_TOKEN}';
+    public static $_url_auto_reaction = 'https://graph.facebook.com/v3.2/{POST_ID}/reactions?type={TYPE}&method=POST&access_token={ACCESS_TOKEN}';
+    public static $_url_auto_post = 'https://graph.facebook.com/v3.2/me/feed?message={MESSAGE}&method=POST&access_token={ACCESS_TOKEN}';
+    public static $_url_get_group_member = 'https://graph.facebook.com/{GROUP_ID}/members?limit={LIMIT}&fields={FIELDS}&access_token={ACCESS_TOKEN}';
+    public static $_url_auto_add_friend = 'https://graph.facebook.com/me/friends?uid={USER_ID}&access_token={ACCESS_TOKEN}';
     
     /**
     * Get post by user id
@@ -58,16 +62,83 @@ class AutoFB {
     }
     
     /**
+    * Get post by user id
+    *
+    * @author AnhMH
+    * @return array|bool Response data or false if error
+    */
+    public static function getGroupMembers($groupId, $token, $limit = '10', $fields = 'id,message,picture,name') {
+        $url = self::$_url_get_group_member;
+        $url = str_replace('{GROUP_ID}', $groupId, $url);
+        $url = str_replace('{ACCESS_TOKEN}', $token, $url);
+        $url = str_replace('{LIMIT}', $limit, $url);
+        $url = str_replace('{FIELDS}', $fields, $url);
+        
+        $data = json_decode(self::call($url), true);
+        if (!empty($data['data'])) {
+            return $data['data'];
+        }
+        return false;
+    }
+    
+    /**
+    * Auto add friend
+    *
+    * @author AnhMH
+    * @return array|bool Response data or false if error
+    */
+    public static function autoAddFriend($userId, $token) {
+        $url = self::$_url_auto_add_friend;
+        $url = str_replace('{USER_ID}', $userId, $url);
+        $url = str_replace('{ACCESS_TOKEN}', $token, $url);
+        
+        $data = json_decode(self::call($url), true);
+        return $data;
+    }
+    
+    /**
     * Auto comment
     *
     * @author AnhMH
     * @return array|bool Response data or false if error
     */
-    public static function autoComment($postId, $token, $message) {
+    public static function autoComment($postId, $token, $message, $au) {
         $url = self::$_url_auto_comment;
         $url = str_replace('{POST_ID}', $postId, $url);
         $url = str_replace('{ACCESS_TOKEN}', $token, $url);
         $url = str_replace('{MESSAGE}', urlencode($message), $url);
+        $url = str_replace('{AU}', urlencode($au), $url);
+        
+        $data = json_decode(self::call($url), true);
+        return $data;
+    }
+    
+    /**
+    * Auto comment
+    *
+    * @author AnhMH
+    * @return array|bool Response data or false if error
+    */
+    public static function autoPost($token, $message) {
+        $url = self::$_url_auto_post;
+        $url = str_replace('{ACCESS_TOKEN}', $token, $url);
+        $url = str_replace('{MESSAGE}', urlencode($message), $url);
+        
+        $data = json_decode(self::call($url), true);
+        return $data;
+    }
+    
+    /**
+    * Auto reaction
+    *
+    * @author AnhMH
+    * @return array|bool Response data or false if error
+    */
+    public static function autoReaction($postId, $token, $type = 'LIKE') {
+        $url = self::$_url_auto_reaction;
+        $url = str_replace('{POST_ID}', $postId, $url);
+        $url = str_replace('{ACCESS_TOKEN}', $token, $url);
+        $url = str_replace('{TYPE}', $type, $url);
         
         $data = json_decode(self::call($url), true);
         return $data;
