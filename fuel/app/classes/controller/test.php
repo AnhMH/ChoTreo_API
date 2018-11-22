@@ -17,16 +17,15 @@ class Controller_Test extends \Controller_App {
     public function action_index() {
         $userId = '100025139146957';
         $groupId = '1531155067212284';
+        $limit = 1;
         $token = 'EAACW5Fg5N2IBALOKsjYpCFgJKt2B1lIUCDDEgCjDX7aNQ0QK79MJ1j28knSbbT0Ra1KHCvrI7yZAWedirOFKOQvkHEyptTlb24GK4HuCx7PEHV23N80xYjZAKmPwOQX4h3QGbNM0abRnCUZCNIZA9B5VyU6MpNLW6bZBNoFLh7hqYZBnomnvPubLnBRJgMZCKUZD';
-//        $posts = Lib\AutoFB::getGroupMembers($groupId, $token, 10);
+        $posts = Lib\AutoFB::getHomePosts($token, $limit);
 //        $posts = Lib\AutoFB::autoAddFriend('100011778742751', $token);
         echo '<pre>';
-        $this->a($token);
-        
-//        print_r($posts);
-        die();
         foreach ($posts as $p) {
-            $a = Lib\AutoFB::autoComment($p['id'], $token, 'aa', 'https://chotreo.com/img/chotreo.png');
+            $postId = $p['id'];
+//            $a = Lib\AutoFB::autoComment($p['id'], $token, 'aa', 'https://chotreo.com/img/chotreo.png');
+            $a = Lib\AutoFB::autoReaction($postId, $token);
             print_r($a);
         }
         die();
