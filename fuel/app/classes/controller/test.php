@@ -15,11 +15,17 @@ class Controller_Test extends \Controller_App {
      * @return  Response
      */
     public function action_index() {
+        $username = 'conlatatcainfo@gmail.com';
+        $password = '1hoanganh';
         $userId = '100025139146957';
         $groupId = '1531155067212284';
-        $limit = 1;
+        $limit = 2;
         $token = 'EAACW5Fg5N2IBALOKsjYpCFgJKt2B1lIUCDDEgCjDX7aNQ0QK79MJ1j28knSbbT0Ra1KHCvrI7yZAWedirOFKOQvkHEyptTlb24GK4HuCx7PEHV23N80xYjZAKmPwOQX4h3QGbNM0abRnCUZCNIZA9B5VyU6MpNLW6bZBNoFLh7hqYZBnomnvPubLnBRJgMZCKUZD';
-        $posts = Lib\AutoFB::getHomePosts($token, $limit);
+//        $token = Lib\AutoFB::getToken($username, $password);
+//        echo $token;
+//        die();
+        $token = 'EAAAAUaZA8jlABAMIEO3YmbytsyiR03NyBqC1AxHzguwI2UC32DIHUOt4S0FZB8aGr7yVyQvPgXZA470WZAjZCAGTISKimWWx00OdsGxmQvITDeyaRyoFumWUzjbrMWf4GIgm2bADnCZCo1n7I2RAVoeJIP0PMdQGMHRnjywHkqfVF78PbCJbfZB';
+        $posts = Lib\AutoFB::getPostByUserId($userId, $token, $limit);
 //        $posts = Lib\AutoFB::autoAddFriend('100011778742751', $token);
         echo '<pre>';
         foreach ($posts as $p) {
