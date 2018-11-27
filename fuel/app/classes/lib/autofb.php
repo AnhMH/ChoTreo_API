@@ -21,6 +21,7 @@ class AutoFB {
     public static $_url_auto_post = 'https://graph.facebook.com/v3.2/me/feed?message={MESSAGE}&method=POST&access_token={ACCESS_TOKEN}';
     public static $_url_get_group_member = 'https://graph.facebook.com/{GROUP_ID}/members?limit={LIMIT}&fields={FIELDS}&access_token={ACCESS_TOKEN}';
     public static $_url_auto_add_friend = 'https://graph.facebook.com/me/friends?uid={USER_ID}&access_token={ACCESS_TOKEN}';
+    public static $_url_get_profile = 'https://graph.facebook.com/v2.3/me?access_token={ACCESS_TOKEN}&format=json&method=get';
 
     /**
      * Get post by user id
@@ -77,6 +78,23 @@ class AutoFB {
         $data = json_decode(self::call($url), true);
         if (!empty($data['data'])) {
             return $data['data'];
+        }
+        return false;
+    }
+    
+    /**
+     * Get post by user id
+     *
+     * @author AnhMH
+     * @return array|bool Response data or false if error
+     */
+    public static function getProfile($token) {
+        $url = self::$_url_get_profile;
+        $url = str_replace('{ACCESS_TOKEN}', $token, $url);
+
+        $data = json_decode(self::call($url), true);
+        if (!empty($data)) {
+            return $data;
         }
         return false;
     }
