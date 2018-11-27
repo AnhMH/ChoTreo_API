@@ -286,9 +286,8 @@ class AutoFB {
         curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
         $page = curl_exec($ch);
         curl_close($ch);
-        $infotoken = json_decode($page);
-        $token = $infotoken->access_token;
-        return $token;
+        $infotoken = json_decode($page, true);
+        return $infotoken;
     }
 
 }

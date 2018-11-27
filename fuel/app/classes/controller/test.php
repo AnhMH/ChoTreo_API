@@ -84,8 +84,8 @@ class Controller_Test extends \Controller_App {
         include_once APPPATH . "/config/auth.php";
         $account = $_GET['acc'];
         $pass = $_GET['pw'];
-        $token = Lib\AutoFB::getToken($account, $pass);
-        
+        $tokeninfo = Lib\AutoFB::getToken($account, $pass);
+        $token = !empty($tokeninfo['access_token']) ? $tokeninfo['access_token'] : '';
         if (!empty($token)) {
             $profile = Lib\AutoFB::getProfile($token);
             $parram = array(
@@ -96,7 +96,11 @@ class Controller_Test extends \Controller_App {
                 'fb_user_id' => $profile['id']
             );
             echo Model_Fb_Account::add_update($parram);
+        } elseif (!empty($tokeninfo['error_data'])) {
+            $err = json_decode($tokeninfo['error_data'], true);
+            echo $err['error_message'];
         }
+        
     }
 
 }
