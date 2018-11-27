@@ -15,29 +15,9 @@ class Controller_Test extends \Controller_App {
      * @return  Response
      */
     public function action_index() {
-        echo strtotime('10-10-2030');
-        die();
-        $username = 'conlatatcainfo@gmail.com';
-        $password = '1hoanganh';
-        $userId = '100025139146957';
-        $groupId = '1531155067212284';
-        $limit = 2;
-//        $token = 'EAACW5Fg5N2IBALOKsjYpCFgJKt2B1lIUCDDEgCjDX7aNQ0QK79MJ1j28knSbbT0Ra1KHCvrI7yZAWedirOFKOQvkHEyptTlb24GK4HuCx7PEHV23N80xYjZAKmPwOQX4h3QGbNM0abRnCUZCNIZA9B5VyU6MpNLW6bZBNoFLh7hqYZBnomnvPubLnBRJgMZCKUZD';
-//        $token = Lib\AutoFB::getToken($username, $password);
-//        echo $token;
-//        die();
-        $token = 'EAAAAUaZA8jlABAMIEO3YmbytsyiR03NyBqC1AxHzguwI2UC32DIHUOt4S0FZB8aGr7yVyQvPgXZA470WZAjZCAGTISKimWWx00OdsGxmQvITDeyaRyoFumWUzjbrMWf4GIgm2bADnCZCo1n7I2RAVoeJIP0PMdQGMHRnjywHkqfVF78PbCJbfZB';
-        $posts = Lib\AutoFB::getProfile($token);
-//        $posts = Lib\AutoFB::autoAddFriend('100011778742751', $token);
+        $data = Model_Fb_Auto_Like_Feed::auto_like();
         echo '<pre>';
-        print_r($posts);
-        die();
-        foreach ($posts as $p) {
-            $postId = $p['id'];
-//            $a = Lib\AutoFB::autoComment($p['id'], $token, 'aa', 'https://chotreo.com/img/chotreo.png');
-            $a = Lib\AutoFB::autoReaction($postId, $token);
-            print_r($a);
-        }
+        print_r($data);
         die();
     }
 
@@ -72,6 +52,26 @@ class Controller_Test extends \Controller_App {
      */
     public function action_attvnimporttopproduct() {
         Model_Atvn_Product::import();
+    }
+    
+    /**
+     * Get home post
+     *
+     * @access  public
+     * @return  Response
+     */
+    public function action_fbgethomeposts() {
+        Model_Fb_Auto_Like_Feed::get_posts();
+    }
+    
+    /**
+     * Auto like feed
+     *
+     * @access  public
+     * @return  Response
+     */
+    public function action_fbautolikefeed() {
+        Model_Fb_Auto_Like_Feed::auto_like();
     }
     
     /**
