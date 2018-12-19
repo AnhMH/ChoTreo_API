@@ -172,6 +172,8 @@ class Model_Product extends Model_Abstract {
         $url = '';
         $self = array();
         $new = false;
+        $admin = Model_Admin::find($adminId);
+        $isConfirm = 0;
         
         // Check code
         if (!empty($param['code'])) {
@@ -214,7 +216,10 @@ class Model_Product extends Model_Abstract {
         if ($new) {
             $self->set('admin_id', $adminId);
         }
-        $self->set('is_confirm', 0);
+        if (!empty($admin['is_trust'])) {
+            $isConfirm = 1;
+        }
+        $self->set('is_confirm', $isConfirm);
         if (!empty($param['name'])) {
             $self->set('name', $param['name']);
             $url = \Lib\Str::convertURL($param['name']);

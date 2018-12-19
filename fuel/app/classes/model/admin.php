@@ -130,6 +130,7 @@ class Model_Admin extends Model_Abstract {
         $admin = self::find($adminId);
         $url = !empty($param['url']) ? \Lib\Str::convertURL($param['url']) : '';
         $time = time();
+        $isConfirm = 0;
         if (empty($admin)) {
             self::errorNotExist('admin_id', $adminId);
             return false;
@@ -158,6 +159,10 @@ class Model_Admin extends Model_Abstract {
             $param['avatar'] = !empty($uploadResult['body']['avatar']) ? $uploadResult['body']['avatar'] : '';
         }
         
+        if (!empty($admin['is_trust'])) {
+            $isConfirm = 1;
+        }
+        
         // Set data
         if (!empty($param['email'])) {
             $admin->set('email', $param['email']);
@@ -183,8 +188,12 @@ class Model_Admin extends Model_Abstract {
         if (!empty($param['url'])) {
             $admin->set('url', $url);
         }
+        if (!empty($param['new_pass'])) {
+            $newPass = \Lib\Util::encodePassword($param['new_pass'], $admin['email']);
+            $admin->set('password', $newPass);
+        }
         $admin->set('updated', $time);
-        $admin->set('is_confirm', 0);
+        $admin->set('is_confirm', $isConfirm);
         
         // Save data
         if ($admin->save()) {
