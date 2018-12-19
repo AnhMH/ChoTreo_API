@@ -44,6 +44,7 @@ class Model_Setting extends Model_Abstract {
         // Get order data
         $query = DB::select(
                 DB::expr("COUNT(id) as total_order"),
+                DB::expr("SUM(case when from_front = 1 then 1 else 0 end) as total_from_front"),
                 DB::expr("SUM(total_qty) as sum_total_qty"),
                 DB::expr("SUM(total_price) as sum_total_price")
             )
