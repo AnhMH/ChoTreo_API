@@ -62,4 +62,11 @@ class Controller_Admins extends \Controller_App {
     public function action_confirm() {
         return \Bus\Admins_Confirm::getInstance()->execute();
     }
+    
+    /**
+     * Admin trust
+     */
+    public function action_trust() {
+        return \Bus\Admins_Trust::getInstance()->execute();
+    }
 }

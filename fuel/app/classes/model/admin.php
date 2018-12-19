@@ -31,7 +31,8 @@ class Model_Admin extends Model_Abstract {
         'disable',
         'url',
         'is_confirm',
-        'point'
+        'point',
+        'is_trust'
     );
 
     protected static $_observers = array(
@@ -435,6 +436,26 @@ class Model_Admin extends Model_Abstract {
         }
         
         $sql = "UPDATE {$table} SET is_confirm = {$disable} WHERE {$cond}";
+        return DB::query($sql)->execute();
+    }
+    
+    /**
+     * Confirm
+     *
+     * @author AnhMH
+     * @param array $param Input data
+     * @return Int|bool
+     */
+    public static function is_trust($param)
+    {
+        $table = self::$_table_name;
+        $cond = '';
+        $disable = !empty($param['is_trust']) ? 1 : 0;
+        if (!empty($param['id'])) {
+            $cond .= "id IN ({$param['id']})";
+        }
+        
+        $sql = "UPDATE {$table} SET is_trust = {$disable} WHERE {$cond}";
         return DB::query($sql)->execute();
     }
 }
